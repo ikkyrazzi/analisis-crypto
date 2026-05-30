@@ -38,14 +38,14 @@ jobs:
     - name: Resolve Swift Package Dependencies
       run: |
         cd ios/App
-        xcodebuild -workspace App.xcworkspace \
+        xcodebuild -project App.xcodeproj \
                    -scheme App \
                    -resolvePackageDependencies
 
     - name: Build iOS (xcodebuild)
       run: |
         cd ios/App
-        xcodebuild -workspace App.xcworkspace \
+        xcodebuild -project App.xcodeproj \
                    -scheme App \
                    -configuration Release \
                    -sdk iphoneos \

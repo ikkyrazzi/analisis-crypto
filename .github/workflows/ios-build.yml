@@ -1,0 +1,60 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build iOS App
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build Web Assets
+      run: |
+        # Asumsikan Anda tidak menggunakan framework JS terpisah, cukup pastikan folder dist ada.
+        # Jika Anda mem-build dengan Vite/Webpack, letakkan perintah build di sini.
+        mkdir -p dist
+        cp index.html dist/
+        cp lightweight-charts.js dist/
+        cp kyysis_logo.png dist/
+        # (Tambahkan copy aset lain jika diperlukan)
+
+    - name: Sync Capacitor
+      run: npx cap sync ios
+
+    - name: Build iOS (xcodebuild)
+      run: |
+        cd ios/App
+        xcodebuild -workspace App.xcworkspace \
+                   -scheme App \
+                   -configuration Release \
+                   -destination 'generic/platform=iOS' \
+                   -archivePath $PWD/build/App.xcarchive \
+                   archive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+
+    - name: Export Unsigned IPA (Sideloadable)
+      run: |
+        cd ios/App/build
+        mkdir -p Payload
+        cp -r App.xcarchive/Products/Applications/App.app Payload/
+        zip -r KyySIS_Unsigned.ipa Payload
+
+    - name: Upload IPA Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: KyySIS-iOS-App
+        path: ios/App/build/KyySIS_Unsigned.ipa
+        retention-days: 7

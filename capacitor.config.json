@@ -1,0 +1,10 @@
+{
+  "appId": "com.ikky.trading",
+  "appName": "KyySIS",
+  "webDir": "dist",
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

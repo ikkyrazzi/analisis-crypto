@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">KyySIS</string>
+    <string name="title_activity_main">KyySIS</string>
+    <string name="package_name">com.ikky.trading</string>
+    <string name="custom_url_scheme">com.ikky.trading</string>
+</resources>

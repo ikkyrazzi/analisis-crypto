@@ -2290,7 +2290,35 @@
         @media (min-width: 769px) {
             .mobile-market-btn { display: none !important; }
             .sidebar-overlay { display: none !important; }
-            .header-top { display: contents; }
+        }
+        
+        /* Maximized Panel Style for full screen chart */
+        .panel-maximized {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 99999 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            background: var(--surface) !important;
+        }
+        .panel-maximized .panel-head {
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 0.5rem 1rem !important;
+            height: 45px !important;
+            gap: 10px !important;
+        }
+        .panel-maximized .panel-head-title {
+            font-size: 0.75rem !important;
+        }
+        .panel-maximized .chart-wrap {
+            flex: 1 !important;
+            height: calc(100vh - 45px) !important;
         }
     </style>
 </head>
@@ -2529,12 +2557,17 @@
                 <!-- Row 1: Chart + Entry -->
                 <div class="results-grid">
                     <!-- Chart Panel -->
-                    <div class="panel">
+                    <div :class="['panel', { 'panel-maximized': isChartMaximized }]">
                         <div class="panel-head">
                             <span class="panel-head-title">Trading Chart</span>
-                            <div class="chart-mode-toggle">
-                                <button :class="['btn-chart-mode', { active: chartMode === 'signal' }]" @click="setChartMode('signal')">🎯 Signal</button>
-                                <button :class="['btn-chart-mode', { active: chartMode === 'standard' }]" @click="setChartMode('standard')">📊 Standard</button>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <div class="chart-mode-toggle">
+                                    <button :class="['btn-chart-mode', { active: chartMode === 'signal' }]" @click="setChartMode('signal')">🎯 Signal</button>
+                                    <button :class="['btn-chart-mode', { active: chartMode === 'standard' }]" @click="setChartMode('standard')">📊 Standard</button>
+                                </div>
+                                <button class="btn-chart-mode" style="border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0;" @click="toggleChartMaximize" :title="isChartMaximized ? 'Minimize' : 'Maximize'">
+                                    <i :class="['pi', isChartMaximized ? 'pi-shrink' : 'pi-expand']"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="chart-wrap">
@@ -2999,6 +3032,7 @@ createApp({
         const selectedNews = ref(null);
         const appState = ref("empty");
         const chartMode = ref(localStorage.getItem("trading_chart_mode") || "signal");
+        const isChartMaximized = ref(false);
         const scanningProgress = ref(0);
         const scanningLogs = ref([]);
         const toasts = ref([]);
@@ -3532,6 +3566,17 @@ createApp({
             nextTick(() => { if (activePairSymbol.value) renderActiveChart(activePairSymbol.value); });
         }
 
+        function toggleChartMaximize() {
+            isChartMaximized.value = !isChartMaximized.value;
+            nextTick(() => {
+                if (lwChart) {
+                    const c = document.getElementById("lightweight_chart");
+                    if (c) lwChart.resize(c.clientWidth, c.clientHeight);
+                }
+                window.dispatchEvent(new Event('resize'));
+            });
+        }
+
         function renderLightweightChart(symbol) {
             const container = document.getElementById("lightweight_chart");
             if (!container) return;
@@ -3819,6 +3864,7 @@ createApp({
             marketTickerPrices, activePairSymbol, activePairAnalysis, activeAnalysisProfile,
             countdownValue, liveTime, appState, scanningProgress, scanningLogs, toasts, apiOnline,
             settingsVisible, resultsActive, chartMode, setChartMode, renderActiveChart,
+            isChartMaximized, toggleChartMaximize,
             telegramChatId, autoNotify, testingTelegram, forwardingTelegram, scanningConsole,
             selectCoin, forceReanalyze, changeAnalysisProfile, testTelegramConnection, forwardSignal, saveSettings, formatPrice,
             lastAnalyzedTime, getTrendClass, getSignalClass, getTfSignalText, getRsiZoneClass, getRsiZoneText, getBbPositionText,

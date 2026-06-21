@@ -7,473 +7,526 @@
 <link rel="icon" href="kyysis_logo.png">
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="lightweight-charts.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0; --border-focus: #38bdf8;
-  --text-primary: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
-  --accent: #0ea5e9; --accent-light: #e0f2fe; --accent-hover: #0284c7;
-  --green-500: #22c55e; --green-600: #16a34a; --green-50: #f0fdf4;
-  --red-500: #ef4444; --red-600: #dc2626; --red-50: #fff1f2;
-  --amber-500: #f59e0b; --amber-50: #fffbeb;
-  --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1; --gray-400: #94a3b8; --gray-500: #64748b;
-  --gray-700: #334155; --gray-800: #1e293b; --gray-900: #0f172a;
-  --font-sans: 'Plus Jakarta Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-xl: 20px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,0.07);
-  --t: all 0.2s cubic-bezier(0.4,0,0.2,1);
+  --bg:       #131722;
+  --bg-2:     #0d1117;
+  --surface:  #1e222d;
+  --surface-2:#2a2e39;
+  --surface-3:#363a45;
+  --border:   #2a2e39;
+  --border-2: #363a45;
+  --text-primary:   #d1d4dc;
+  --text-secondary: #787b86;
+  --text-muted:     #4c525e;
+  --green:      #26a69a;
+  --green-dim:  rgba(38,166,154,.12);
+  --red:        #ef5350;
+  --red-dim:    rgba(239,83,80,.12);
+  --blue:       #2962ff;
+  --blue-light: #1e88e5;
+  --blue-dim:   rgba(41,98,255,.1);
+  --yellow:     #f9a825;
+  --yellow-dim: rgba(249,168,37,.1);
+  --purple:     #7c3aed;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --shadow:    0 1px 4px rgba(0,0,0,.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.55);
+  --t: all 0.15s ease;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans);min-height:100vh;overflow-x:hidden;background-image:radial-gradient(ellipse at 0% 0%,rgba(14,165,233,0.06) 0%,transparent 50%)}
-::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--gray-100)}::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:99px}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans);font-size:13px;min-height:100vh;overflow-x:hidden;line-height:1.4}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
 
-.app{max-width:1600px;margin:0 auto;padding:1rem 1.25rem;display:flex;flex-direction:column;gap:1rem}
+/* ===== APP SHELL ===== */
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
-/* HEADER */
-.header{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:.75rem 1.25rem;box-shadow:var(--shadow-sm);flex-wrap:wrap;gap:.75rem}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-mark{width:34px;height:34px;border-radius:var(--radius-md);overflow:hidden;display:flex;align-items:center;justify-content:center}
-.logo-mark img{width:100%;height:100%;object-fit:cover}
-.logo-text{font-size:1.3rem;font-weight:700;color:var(--gray-800);letter-spacing:-.5px}
-.logo-text span{color:var(--accent)}
-.logo-badge{font-size:.6rem;font-family:var(--font-mono);font-weight:700;background:var(--accent-light);color:#0284c7;border:1px solid #bae6fd;padding:2px 7px;border-radius:99px;letter-spacing:.5px}
-.header-right{display:flex;align-items:center;gap:.6rem}
-.clock-pill{display:flex;align-items:center;gap:6px;background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius-md);padding:5px 12px;font-family:var(--font-mono);font-size:.8rem;font-weight:600;color:var(--text-primary)}
-.status-pill{display:flex;align-items:center;gap:6px;background:var(--gray-50);border:1px solid var(--border);border-radius:99px;padding:5px 12px;font-size:.78rem;font-weight:500;color:var(--text-secondary)}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green-500);box-shadow:0 0 0 2px rgba(34,197,94,.2);animation:pulse-dot 2s infinite}
-.status-dot.off{background:var(--red-500);box-shadow:0 0 0 2px rgba(239,68,68,.2)}
-@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.5}}
-.btn-icon{width:36px;height:36px;background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);transition:var(--t)}
-.btn-icon:hover{background:var(--accent-light);border-color:#bae6fd;color:var(--accent-hover)}
+/* ===== HEADER / TOP BAR ===== */
+.header{
+  height:48px;background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:stretch;flex-shrink:0;z-index:50;position:sticky;top:0;
+}
+.header-left{
+  display:flex;align-items:center;gap:10px;padding:0 14px;
+  border-right:1px solid var(--border);flex-shrink:0;
+}
+.logo{display:flex;align-items:center;gap:7px}
+.logo-mark{width:24px;height:24px;border-radius:4px;overflow:hidden;background:var(--surface-2);flex-shrink:0}
+.logo-mark img{width:100%;height:100%;object-fit:cover;display:block}
+.logo-text{font-size:.85rem;font-weight:700;color:var(--text-primary);letter-spacing:-.3px;white-space:nowrap}
+.logo-text em{color:#64b5f6;font-style:normal}
+.logo-badge{font-size:.52rem;font-family:var(--font-mono);font-weight:700;background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border-2);padding:1px 5px;border-radius:var(--radius-sm);letter-spacing:.3px;white-space:nowrap}
 
-/* NAV */
-.main-nav{display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:5px;box-shadow:var(--shadow-sm)}
-.nav-tab{display:flex;align-items:center;gap:7px;padding:8px 18px;border:none;border-radius:var(--radius-lg);background:transparent;font-family:var(--font-sans);font-size:.83rem;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--t)}
-.nav-tab:hover{background:var(--gray-50);color:var(--text-primary)}
-.nav-tab.active{background:var(--accent);color:white;box-shadow:0 2px 8px rgba(14,165,233,.3)}
-.nav-tab.active-news{background:#7c3aed;color:white;box-shadow:0 2px 8px rgba(124,58,237,.3)}
-.nav-tab svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.mobile-menu-btn{
+  display:none;width:30px;height:30px;background:transparent;border:1px solid var(--border);
+  border-radius:var(--radius-md);align-items:center;justify-content:center;
+  color:var(--text-secondary);transition:var(--t);
+}
+.mobile-menu-btn:hover{background:var(--surface-2);color:var(--text-primary)}
+.mobile-menu-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
 
-/* DASHBOARD GRID */
-.dashboard-grid{display:grid;grid-template-columns:280px 1fr;gap:1rem;align-items:start}
-@media(max-width:1024px){.dashboard-grid{grid-template-columns:1fr}}
+/* NAV TABS */
+.header-nav{display:flex;align-items:stretch;padding:0 6px;gap:0;flex:1}
+.nav-tab{
+  display:flex;align-items:center;gap:6px;padding:0 14px;
+  background:transparent;border:none;border-bottom:2px solid transparent;
+  font-family:var(--font-sans);font-size:.78rem;font-weight:500;
+  color:var(--text-secondary);transition:var(--t);white-space:nowrap;
+}
+.nav-tab:hover{color:var(--text-primary);background:rgba(255,255,255,.03)}
+.nav-tab.active{color:var(--text-primary);border-bottom-color:var(--blue-light)}
+.nav-tab.active-news{color:#a78bfa;border-bottom-color:var(--purple)}
+.nav-tab svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.nav-tab-count{background:var(--purple);color:white;font-size:.48rem;font-weight:700;padding:1px 5px;border-radius:99px;line-height:1.6;min-width:16px;text-align:center}
 
-/* SIDEBAR */
-.sidebar{background:#0d1117;border-radius:18px;border:1px solid rgba(255,255,255,.07);box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden;position:sticky;top:1rem;display:flex;flex-direction:column}
-.sb-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(255,255,255,.05) 0%,transparent 100%)}
-.sb-title{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35)}
-.sb-exchange{font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85)}
-.live-pill{display:flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:99px;padding:3px 8px 3px 6px}
-.live-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.8);animation:live-pulse 1.8s ease-in-out infinite}
-@keyframes live-pulse{0%,100%{opacity:1;box-shadow:0 0 6px rgba(34,197,94,.8)}50%{opacity:.6;box-shadow:0 0 12px rgba(34,197,94,.4)}}
-.live-text{font-size:.62rem;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.5px}
-.countdown{font-family:var(--font-mono);font-size:.66rem;font-weight:700;color:rgba(255,255,255,.35);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:3px 8px;border-radius:99px}
-.sb-search{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.05)}
-.search-wrap{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:6px 10px;transition:var(--t)}
-.search-wrap:focus-within{background:rgba(255,255,255,.07);border-color:rgba(14,165,233,.4)}
-.search-wrap svg{color:rgba(255,255,255,.3);flex-shrink:0}
-.search-wrap input{background:transparent;border:none;outline:none;font-family:var(--font-sans);font-size:.76rem;color:rgba(255,255,255,.8);width:100%}
-.search-wrap input::placeholder{color:rgba(255,255,255,.2)}
-.market-list{display:flex;flex-direction:column;max-height:calc(100vh - 210px);overflow-y:auto}
-.market-list::-webkit-scrollbar{width:3px}
-.market-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px}
-.coin-card{display:flex;align-items:center;gap:9px;padding:8px 13px 8px 11px;cursor:pointer;transition:background .15s ease;border-bottom:1px solid rgba(255,255,255,.03);position:relative}
-.coin-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;background:transparent;transition:var(--t);border-radius:0 2px 2px 0}
-.coin-card:hover{background:rgba(255,255,255,.04)}
-.coin-card.active{background:rgba(14,165,233,.08)}
-.coin-card.active::before{background:#0ea5e9}
-.coin-card.pos.active::before{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.5)}
-.coin-card.neg.active::before{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.5)}
-.coin-rank{font-family:var(--font-mono);font-size:.6rem;font-weight:700;color:rgba(255,255,255,.18);width:16px;text-align:center;flex-shrink:0}
-.coin-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.75rem;color:white;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.coin-info{flex:1;min-width:0}
-.coin-sym{font-weight:700;font-size:.8rem;color:rgba(255,255,255,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.coin-name-s{font-size:.65rem;color:rgba(255,255,255,.28);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.coin-spark{display:flex;align-items:flex-end;gap:1.5px;height:20px;flex-shrink:0}
-.spark-bar{width:3px;border-radius:1px}
-.coin-prices{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
-.coin-price{font-family:var(--font-mono);font-weight:700;font-size:.8rem;color:rgba(255,255,255,.88)}
-.coin-chg{font-family:var(--font-mono);font-size:.66rem;font-weight:700;padding:1px 5px;border-radius:4px}
-.coin-chg.up{color:#22c55e;background:rgba(34,197,94,.1)}
-.coin-chg.dn{color:#ef4444;background:rgba(239,68,68,.1)}
-.sb-footer{padding:9px 13px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.2)}
-.sb-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
-.sb-stat-val{font-family:var(--font-mono);font-size:.76rem;font-weight:700}
-.sb-stat-lbl{font-size:.58rem;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.2)}
-.sb-divider{width:1px;height:22px;background:rgba(255,255,255,.06)}
-.mkt-loading{padding:2rem;text-align:center;color:rgba(255,255,255,.25);font-size:.78rem;display:flex;flex-direction:column;align-items:center;gap:10px}
-.mkt-spinner{width:26px;height:26px;border:2px solid rgba(255,255,255,.08);border-top-color:rgba(14,165,233,.6);border-radius:50%;animation:spin .8s linear infinite}
+/* HEADER RIGHT */
+.header-right{
+  display:flex;align-items:center;gap:4px;padding:0 12px;
+  border-left:1px solid var(--border);flex-shrink:0;
+}
+.clock-pill{display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:.68rem;color:var(--text-secondary);padding:0 8px;height:26px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md)}
+.clock-pill svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2}
+.status-pill{display:flex;align-items:center;gap:4px;font-size:.68rem;color:var(--text-secondary);padding:0 8px;height:26px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md)}
+.status-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse-dot 2s infinite;flex-shrink:0}
+.status-dot.off{background:var(--red);animation:none}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.35}}
+.btn-icon{width:26px;height:26px;background:transparent;border:1px solid var(--border);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:var(--t)}
+.btn-icon:hover{background:var(--surface-2);border-color:var(--border-2);color:var(--text-primary)}
+.btn-icon svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ===== BODY LAYOUT ===== */
+.body-layout{display:flex;flex:1;overflow:hidden}
+
+/* ===== SIDEBAR / WATCHLIST ===== */
+.sidebar{
+  width:236px;flex-shrink:0;background:var(--bg);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sb-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 10px;height:34px;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-shrink:0;
+}
+.sb-title{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted)}
+.sb-meta{display:flex;align-items:center;gap:7px}
+.live-pill{display:flex;align-items:center;gap:3px}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 4px var(--green);animation:pulse-dot 1.8s infinite}
+.live-text{font-size:.55rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px}
+.countdown{font-family:var(--font-mono);font-size:.58rem;color:var(--text-muted)}
+.sb-search{padding:5px 7px;border-bottom:1px solid var(--border);flex-shrink:0}
+.search-wrap{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:5px 8px;transition:var(--t)}
+.search-wrap:focus-within{border-color:var(--blue-light)}
+.search-wrap svg{width:11px;height:11px;color:var(--text-muted);flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2.5}
+.search-wrap input{background:transparent;border:none;outline:none;font-family:var(--font-sans);font-size:.73rem;color:var(--text-primary);width:100%}
+.search-wrap input::placeholder{color:var(--text-muted)}
+.market-list{display:flex;flex-direction:column;flex:1;overflow-y:auto}
+.mkt-loading{padding:2rem 1rem;text-align:center;color:var(--text-muted);font-size:.72rem;display:flex;flex-direction:column;align-items:center;gap:10px}
+.mkt-spinner{width:18px;height:18px;border:2px solid var(--border-2);border-top-color:var(--blue-light);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.coin-card{
+  display:flex;align-items:center;gap:7px;padding:0 9px;height:46px;
+  cursor:pointer;border-bottom:1px solid rgba(42,46,57,.4);
+  transition:background .1s;position:relative;flex-shrink:0;
+}
+.coin-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:transparent;transition:var(--t)}
+.coin-card:hover{background:var(--surface-2)}
+.coin-card.active{background:rgba(41,98,255,.04)}
+.coin-card.active::before{background:var(--blue-light)}
+.coin-card.pos.active::before{background:var(--green)}
+.coin-card.neg.active::before{background:var(--red)}
+.coin-rank{font-family:var(--font-mono);font-size:.52rem;font-weight:500;color:var(--text-muted);width:13px;text-align:center;flex-shrink:0}
+.coin-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.6rem;color:white;flex-shrink:0}
+.coin-info{flex:1;min-width:0}
+.coin-sym{font-weight:600;font-size:.74rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.2px}
+.coin-name-s{font-size:.6rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.coin-spark{display:flex;align-items:flex-end;gap:1px;height:16px;flex-shrink:0}
+.spark-bar{width:2px;border-radius:1px}
+.coin-prices{display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex-shrink:0}
+.coin-price{font-family:var(--font-mono);font-size:.68rem;font-weight:600;color:var(--text-primary)}
+.coin-chg{font-family:var(--font-mono);font-size:.6rem;font-weight:600}
+.coin-chg.up{color:var(--green)}.coin-chg.dn{color:var(--red)}
+.sb-footer{
+  padding:5px 10px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;align-items:center;
+  background:var(--surface);flex-shrink:0;height:30px;
+}
+.sb-stat{display:flex;align-items:center;gap:4px}
+.sb-stat-val{font-family:var(--font-mono);font-size:.68rem;font-weight:700}
+.sb-stat-lbl{font-size:.57rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+.sb-divider{width:1px;height:14px;background:var(--border)}
+.sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:997;backdrop-filter:blur(2px)}
 
-/* MAIN PANEL */
-.main-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);min-height:580px;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);overflow:hidden}
+/* ===== MAIN CONTENT ===== */
+.main-content{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column;min-width:0}
 
-/* EMPTY */
-.state-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;padding:3rem 2rem;text-align:center}
-.empty-icon{width:76px;height:76px;border-radius:50%;background:var(--accent-light);border:2px dashed #bae6fd;display:flex;align-items:center;justify-content:center}
-.empty-icon svg{width:34px;height:34px;stroke:#7dd3fc;fill:none;stroke-width:1.5;animation:rotate-slow 20s linear infinite}
+/* ===== EMPTY STATE ===== */
+.state-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:3rem;text-align:center;min-height:500px}
+.empty-icon{width:60px;height:60px;border-radius:50%;background:var(--surface);border:1px solid var(--border-2);display:flex;align-items:center;justify-content:center}
+.empty-icon svg{width:26px;height:26px;stroke:var(--text-muted);fill:none;stroke-width:1.5;animation:rotate-slow 20s linear infinite}
 @keyframes rotate-slow{to{transform:rotate(360deg)}}
-.empty-title{font-size:1.2rem;font-weight:700;color:var(--gray-700)}
-.empty-desc{font-size:.88rem;color:var(--text-secondary);max-width:380px;line-height:1.6}
-.empty-hint{display:flex;align-items:center;gap:7px;background:var(--accent-light);border:1px solid #bae6fd;border-radius:var(--radius-lg);padding:.55rem .9rem;font-size:.8rem;color:#0369a1;font-weight:500}
+.empty-title{font-size:.95rem;font-weight:600;color:var(--text-primary)}
+.empty-desc{font-size:.77rem;color:var(--text-secondary);max-width:400px;line-height:1.65}
+.empty-hint{display:flex;align-items:center;gap:7px;background:var(--blue-dim);border:1px solid rgba(41,98,255,.2);border-radius:var(--radius-md);padding:.45rem .85rem;font-size:.72rem;color:#90a4ff;font-weight:500}
+.empty-hint svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
 
-/* SCANNING */
-.state-scanning{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;padding:2.5rem}
-.scan-loader{position:relative;width:80px;height:80px}
+/* ===== SCANNING STATE ===== */
+.state-scanning{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:2rem;min-height:500px}
+.scan-loader{position:relative;width:60px;height:60px}
 .scan-ring{position:absolute;inset:0;border-radius:50%;border:2px solid transparent}
-.scan-ring-outer{border-top-color:var(--accent);border-right-color:#bae6fd;animation:spin 1.2s linear infinite}
-.scan-ring-inner{inset:12px;border-top-color:#0284c7;border-left-color:#7dd3fc;animation:spin .8s linear infinite reverse}
-.scan-center{position:absolute;inset:26px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(14,165,233,.15)}
-.scan-title{font-size:1.05rem;font-weight:700;color:var(--gray-800)}
-.scan-prog-wrap{width:300px;display:flex;flex-direction:column;gap:5px}
-.scan-prog-track{height:4px;background:var(--gray-100);border-radius:99px;overflow:hidden}
-.scan-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),#38bdf8);border-radius:99px;transition:width .15s ease-out}
-.scan-pct{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);text-align:right}
-.scan-console{width:460px;max-width:100%;height:100px;background:var(--gray-900);border:1px solid var(--gray-700);border-radius:var(--radius-md);padding:9px 13px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;font-family:var(--font-mono);font-size:.7rem;text-align:left}
-.con-line{color:#94a3b8;display:flex;gap:7px;animation:fadein .2s ease forwards}
-.con-line.ok{color:#4ade80}.con-line.info{color:#38bdf8}
-@keyframes fadein{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.scan-ring-outer{border-top-color:var(--blue-light);border-right-color:rgba(30,136,229,.25);animation:spin 1.1s linear infinite}
+.scan-ring-inner{inset:9px;border-top-color:var(--green);border-left-color:rgba(38,166,154,.25);animation:spin .75s linear infinite reverse}
+.scan-center{position:absolute;inset:21px;border-radius:50%;background:var(--blue-light);box-shadow:0 0 10px rgba(30,136,229,.4)}
+.scan-title{font-size:.9rem;font-weight:600;color:var(--text-primary)}
+.scan-prog-wrap{width:260px;display:flex;flex-direction:column;gap:4px}
+.scan-prog-track{height:3px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.scan-prog-fill{height:100%;background:linear-gradient(90deg,var(--blue-light),var(--green));border-radius:99px;transition:width .15s ease-out}
+.scan-pct{font-family:var(--font-mono);font-size:.62rem;color:var(--text-muted);text-align:right}
+.scan-console{width:420px;max-width:100%;height:84px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:7px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;font-family:var(--font-mono);font-size:.62rem}
+.con-line{color:var(--text-muted);display:flex;gap:6px;animation:fadein .2s ease forwards}
+.con-line.ok{color:var(--green)}.con-line.info{color:var(--blue-light)}
+@keyframes fadein{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}
 
-/* RESULTS */
-.state-results{display:flex;flex-direction:column;gap:1rem;padding:1.25rem;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease}
+/* ===== RESULTS ===== */
+.state-results{display:flex;flex-direction:column;opacity:0;transform:translateY(5px);transition:opacity .3s ease,transform .3s ease}
 .state-results.active{opacity:1;transform:translateY(0)}
 
-/* RESULT HEADER */
-.result-header{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,var(--accent-light),var(--gray-50));border:1px solid #bae6fd;border-radius:var(--radius-lg);padding:1rem 1.25rem;flex-wrap:wrap;gap:.75rem}
-.result-id{display:flex;align-items:center;gap:11px}
-.result-avatar{width:42px;height:42px;border-radius:var(--radius-md);background:linear-gradient(135deg,#38bdf8,#0284c7);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.15rem;color:white;box-shadow:0 3px 10px rgba(14,165,233,.3)}
-.result-pair{font-size:1.25rem;font-weight:700;color:var(--gray-800)}
-.result-full{font-size:.78rem;color:var(--text-muted)}
-.result-ticker{display:flex;align-items:center;gap:1.25rem}
-.ticker-item{display:flex;flex-direction:column;gap:2px}
-.ticker-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);font-weight:600}
-.ticker-val{font-family:var(--font-mono);font-weight:700;font-size:1rem;color:var(--gray-800)}
-.ticker-val.up{color:var(--green-600)}.ticker-val.dn{color:var(--red-600)}
-.signal-badge{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:var(--radius-md);font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px}
-.signal-badge.strong-buy{background:var(--green-50);border:1.5px solid var(--green-500);color:var(--green-600)}
-.signal-badge.buy{background:var(--green-50);border:1.5px solid #86efac;color:var(--green-600)}
-.signal-badge.neutral{background:var(--gray-50);border:1.5px solid var(--gray-300);color:var(--gray-500)}
-.signal-badge.sell{background:var(--red-50);border:1.5px solid #fca5a5;color:var(--red-600)}
-.signal-badge.strong-sell{background:var(--red-50);border:1.5px solid var(--red-500);color:var(--red-600)}
-.signal-badge.no-signal{background:var(--amber-50);border:1.5px solid #fde68a;color:#b45309}
-.btn-refresh{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:7px 13px;font-family:var(--font-sans);font-size:.78rem;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--t)}
-.btn-refresh:hover{background:var(--accent-light);border-color:#bae6fd;color:var(--accent-hover)}
+/* RESULT TOP BAR */
+.result-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 12px;background:var(--surface);border-bottom:1px solid var(--border);
+  flex-wrap:wrap;gap:8px;flex-shrink:0;
+}
+.result-id{display:flex;align-items:center;gap:9px}
+.result-avatar{width:30px;height:30px;border-radius:var(--radius-md);background:linear-gradient(135deg,#1e88e5,#1565c0);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;color:white;flex-shrink:0}
+.result-pair{font-size:.95rem;font-weight:700;color:var(--text-primary);letter-spacing:-.3px}
+.result-full{font-size:.64rem;color:var(--text-muted)}
+.result-ticker{display:flex;align-items:center;gap:16px}
+.ticker-item{display:flex;flex-direction:column;gap:1px}
+.ticker-lbl{font-size:.55rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);font-weight:700}
+.ticker-val{font-family:var(--font-mono);font-weight:700;font-size:.85rem;color:var(--text-primary)}
+.ticker-val.up{color:var(--green)}.ticker-val.dn{color:var(--red)}
+.result-actions{display:flex;align-items:center;gap:6px}
 
-/* CONFLUENCE GATE BANNER */
-.conf-gate{display:flex;align-items:center;gap:10px;padding:.85rem 1.1rem;border-radius:var(--radius-lg);border:1.5px solid;font-size:.84rem;font-weight:600}
-.conf-gate.pass{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.3);color:var(--green-600)}
-.conf-gate.fail{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.3);color:#b45309}
-.conf-gate.locked{background:rgba(148,163,184,.07);border-color:rgba(148,163,184,.3);color:var(--gray-500)}
-.conf-gate-icon{font-size:1.2rem;flex-shrink:0}
-.conf-gate-text{flex:1}
-.conf-gate-count{font-family:var(--font-mono);font-size:.78rem;font-weight:700;padding:2px 9px;border-radius:99px}
-.conf-gate.pass .conf-gate-count{background:rgba(34,197,94,.15);color:var(--green-600)}
-.conf-gate.fail .conf-gate-count{background:rgba(245,158,11,.15);color:#b45309}
-.conf-gate.locked .conf-gate-count{background:rgba(148,163,184,.15);color:var(--gray-500)}
+/* SIGNAL BADGE */
+.signal-badge{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--radius-md);font-weight:700;font-size:.67rem;text-transform:uppercase;letter-spacing:.5px;border:1px solid}
+.signal-badge.strong-buy{background:rgba(38,166,154,.14);border-color:rgba(38,166,154,.4);color:var(--green)}
+.signal-badge.buy{background:rgba(38,166,154,.07);border-color:rgba(38,166,154,.2);color:var(--green)}
+.signal-badge.neutral{background:var(--surface-2);border-color:var(--border-2);color:var(--text-secondary)}
+.signal-badge.sell{background:rgba(239,83,80,.07);border-color:rgba(239,83,80,.2);color:var(--red)}
+.signal-badge.strong-sell{background:rgba(239,83,80,.14);border-color:rgba(239,83,80,.4);color:var(--red)}
+.signal-badge.no-signal{background:rgba(249,168,37,.07);border-color:rgba(249,168,37,.25);color:var(--yellow)}
+.btn-refresh{display:flex;align-items:center;gap:4px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--radius-md);padding:4px 9px;font-family:var(--font-sans);font-size:.68rem;font-weight:500;color:var(--text-secondary);transition:var(--t)}
+.btn-refresh:hover{background:var(--surface-3);color:var(--text-primary)}
+.btn-refresh svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+/* CONFLUENCE GATE */
+.conf-gate{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--border);font-size:.74rem;font-weight:500;flex-shrink:0}
+.conf-gate.pass{background:rgba(38,166,154,.05);color:#66bb9a}
+.conf-gate.fail{background:rgba(249,168,37,.05);color:var(--yellow)}
+.conf-gate.locked{background:rgba(120,123,134,.04);color:var(--text-secondary)}
+.conf-gate-icon{font-size:.9rem;flex-shrink:0}
+.conf-gate-text{flex:1;font-size:.73rem}
+.conf-gate-count{font-family:var(--font-mono);font-size:.67rem;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--surface-2);color:var(--text-secondary)}
 
 /* STRATEGY BAR */
-.strategy-bar{display:flex;align-items:center;justify-content:space-between;background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.65rem .9rem;flex-wrap:wrap;gap:7px}
-.strategy-label{font-size:.76rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
-.strategy-btns{display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:3px}
-.btn-strat{background:transparent;border:none;border-radius:var(--radius-sm);padding:5px 13px;font-family:var(--font-sans);font-size:.76rem;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--t)}
-.btn-strat:hover{color:var(--text-primary)}
-.btn-strat.active{background:var(--accent);color:white;box-shadow:0 2px 6px rgba(14,165,233,.3)}
+.strategy-bar{display:flex;align-items:center;gap:10px;padding:5px 12px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0}
+.strategy-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)}
+.strategy-btns{display:flex;gap:2px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:2px}
+.btn-strat{background:transparent;border:none;border-radius:var(--radius-sm);padding:3px 11px;font-family:var(--font-sans);font-size:.68rem;font-weight:500;color:var(--text-secondary);transition:var(--t)}
+.btn-strat:hover{color:var(--text-primary);background:var(--surface-2)}
+.btn-strat.active{background:var(--blue-light);color:white}
 
-/* RESULTS GRID */
-.results-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:1rem}
+/* RESULTS BODY / GRID */
+.results-body{padding:8px;display:flex;flex-direction:column;gap:7px}
+.results-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:7px}
 @media(max-width:1200px){.results-grid{grid-template-columns:1fr}}
 
 /* PANEL */
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
-.panel-head{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1rem;border-bottom:1px solid var(--border);background:var(--gray-50)}
-.panel-head-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-secondary)}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+.panel-head{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid var(--border);background:var(--surface)}
+.panel-head-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-secondary)}
 
 /* CHART */
-.chart-wrap{height:380px;position:relative}
-.chart-inner{position:absolute;inset:0;background:var(--gray-900)}
-.chart-mode-toggle{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px}
-.btn-cmode{background:transparent;border:none;border-radius:4px;padding:4px 9px;font-family:var(--font-sans);font-size:.7rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:var(--t)}
-.btn-cmode.active{background:var(--accent);color:white}
+.chart-wrap{height:320px;position:relative}
+.chart-inner{position:absolute;inset:0;background:#131722}
+.chart-mode-toggle{display:flex;gap:2px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:2px}
+.btn-cmode{background:transparent;border:none;border-radius:var(--radius-sm);padding:3px 8px;font-family:var(--font-sans);font-size:.62rem;font-weight:600;color:var(--text-muted);transition:var(--t)}
+.btn-cmode.active{background:var(--blue-light);color:white}
 
-/* VOLUME PROFILE PANEL */
-.vp-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-top:0}
-.vp-body{padding:.75rem 1rem;display:flex;flex-direction:column;gap:6px}
-.vp-bar-row{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:.68rem}
-.vp-price-label{width:80px;text-align:right;color:var(--text-muted);flex-shrink:0}
-.vp-bar-track{flex:1;height:16px;background:var(--gray-100);border-radius:3px;overflow:hidden;position:relative}
-.vp-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
-.vp-bar-fill.poc{background:linear-gradient(90deg,#ef4444,#f87171)}
-.vp-bar-fill.val{background:linear-gradient(90deg,#0ea5e9,#38bdf8)}
-.vp-bar-fill.normal{background:linear-gradient(90deg,#94a3b8,#cbd5e1)}
-.vp-vol-label{width:55px;color:var(--text-muted);flex-shrink:0}
-.vp-legend{display:flex;gap:12px;margin-top:4px;flex-wrap:wrap}
-.vp-leg-item{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--text-muted)}
-.vp-leg-dot{width:8px;height:8px;border-radius:2px}
-.vp-key-levels{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
-.vp-level-pill{font-family:var(--font-mono);font-size:.68rem;font-weight:600;padding:3px 9px;border-radius:99px}
-.vp-level-pill.poc{background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2)}
-.vp-level-pill.vah{background:rgba(14,165,233,.1);color:#0284c7;border:1px solid rgba(14,165,233,.2)}
-.vp-level-pill.val-pill{background:rgba(34,197,94,.1);color:var(--green-600);border:1px solid rgba(34,197,94,.2)}
+/* VOLUME PROFILE */
+.vp-body{padding:7px 10px;display:flex;flex-direction:column;gap:4px}
+.vp-bar-row{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:.6rem}
+.vp-price-label{width:68px;text-align:right;color:var(--text-muted);flex-shrink:0}
+.vp-bar-track{flex:1;height:13px;background:var(--surface-2);border-radius:2px;overflow:hidden;position:relative}
+.vp-bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.vp-bar-fill.poc{background:rgba(239,83,80,.65)}
+.vp-bar-fill.val{background:rgba(30,136,229,.45)}
+.vp-bar-fill.normal{background:rgba(120,123,134,.22)}
+.vp-vol-label{width:42px;color:var(--text-muted);flex-shrink:0}
+.vp-legend{display:flex;gap:10px;margin-top:3px;flex-wrap:wrap}
+.vp-leg-item{display:flex;align-items:center;gap:3px;font-size:.6rem;color:var(--text-muted)}
+.vp-leg-dot{width:6px;height:6px;border-radius:1px}
+.vp-level-pill{font-family:var(--font-mono);font-size:.6rem;font-weight:600;padding:2px 6px;border-radius:var(--radius-sm)}
+.vp-level-pill.poc{background:rgba(239,83,80,.1);color:var(--red);border:1px solid rgba(239,83,80,.2)}
+.vp-level-pill.vah{background:rgba(30,136,229,.1);color:#64b5f6;border:1px solid rgba(30,136,229,.2)}
+.vp-level-pill.val-pill{background:rgba(38,166,154,.1);color:var(--green);border:1px solid rgba(38,166,154,.2)}
 
 /* ENTRY PANEL */
-.entry-panel{border:1.5px solid #bae6fd;background:linear-gradient(180deg,var(--accent-light) 0%,var(--surface) 100%)}
-.entry-panel.short{border-color:#fca5a5;background:linear-gradient(180deg,var(--red-50) 0%,var(--surface) 100%)}
-.entry-panel.neutral{border-color:var(--gray-300);background:var(--surface)}
-.entry-panel-head{padding:.85rem 1rem;border-bottom:1px solid #bae6fd;display:flex;justify-content:space-between;align-items:center}
-.entry-panel.short .entry-panel-head{border-bottom-color:#fca5a5}
-.entry-panel.neutral .entry-panel-head{border-bottom-color:var(--gray-200);background:var(--gray-50)}
-.entry-dir-badge{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 9px;border-radius:99px}
-.entry-panel:not(.short):not(.neutral) .entry-dir-badge{background:var(--accent-light);color:#0369a1;border:1px solid #bae6fd}
-.entry-panel.short .entry-dir-badge{background:var(--red-50);color:var(--red-600);border:1px solid #fca5a5}
-.entry-panel.neutral .entry-dir-badge{background:var(--gray-100);color:var(--gray-500);border:1px solid var(--gray-300)}
-.conf-ring{position:relative;width:60px;height:60px}
+.entry-panel{background:var(--surface);border:1px solid var(--border)}
+.entry-panel.short{border-color:rgba(239,83,80,.3)}
+.entry-panel.neutral{border-color:var(--border)}
+.entry-panel-head{padding:7px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--surface)}
+.entry-panel.short .entry-panel-head{border-bottom-color:rgba(239,83,80,.2)}
+.entry-dir-badge{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 7px;border-radius:var(--radius-sm);border:1px solid}
+.entry-panel:not(.short):not(.neutral) .entry-dir-badge{background:rgba(38,166,154,.08);color:var(--green);border-color:rgba(38,166,154,.25)}
+.entry-panel.short .entry-dir-badge{background:rgba(239,83,80,.08);color:var(--red);border-color:rgba(239,83,80,.25)}
+.entry-panel.neutral .entry-dir-badge{background:var(--surface-2);color:var(--text-secondary);border-color:var(--border-2)}
+.conf-ring{position:relative;width:46px;height:46px}
 .conf-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.conf-ring circle{fill:none;stroke-width:5}
-.conf-bg-c{stroke:var(--gray-100)}
-.conf-fill-c{stroke:var(--accent);stroke-dasharray:160;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
-.entry-panel.short .conf-fill-c{stroke:var(--red-500)}
+.conf-ring circle{fill:none;stroke-width:4}
+.conf-bg-c{stroke:var(--surface-2)}
+.conf-fill-c{stroke:var(--blue-light);stroke-dasharray:126;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
+.entry-panel.short .conf-fill-c{stroke:var(--red)}
 .conf-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
-.conf-pct{font-family:var(--font-mono);font-weight:700;font-size:.85rem;color:#0369a1}
-.entry-panel.short .conf-pct{color:var(--red-600)}
-.conf-lbl{font-size:.52rem;font-weight:600;text-transform:uppercase;color:var(--text-muted)}
-.entry-rows{padding:.85rem 1rem;display:flex;flex-direction:column;gap:7px}
-.entry-row{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);transition:var(--t)}
-.entry-row:hover{border-color:#bae6fd}
-.entry-row.zone{background:var(--accent-light);border-color:#bae6fd}
-.entry-row.sl-row{background:var(--red-50);border-color:#fca5a5}
-.entry-row-lbl{display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:600;color:var(--text-secondary)}
-.rr-tag{font-size:.66rem;font-weight:600;color:#0284c7;background:var(--accent-light);border:1px solid #bae6fd;padding:1px 6px;border-radius:99px}
-.entry-row-val{font-family:var(--font-mono);font-weight:700;font-size:.92rem}
-.entry-row-val.tp{color:var(--green-600)}
-.entry-row-val.sl{color:var(--red-600)}
-.entry-row-val.entry{color:#0369a1;font-size:.82rem}
-
-/* ENTRY STATUS */
-.entry-status{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:var(--radius-md);border:1.5px solid;margin-bottom:2px}
-.entry-status.es-enter{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.3)}
-.entry-status.es-near{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.3)}
-.entry-status.es-wait{background:rgba(14,165,233,.07);border-color:rgba(14,165,233,.25)}
-.entry-status.es-miss{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.25)}
-.es-emoji{font-size:1rem;flex-shrink:0}
+.conf-pct{font-family:var(--font-mono);font-weight:700;font-size:.72rem;color:var(--blue-light)}
+.entry-panel.short .conf-pct{color:var(--red)}
+.conf-lbl{font-size:.46rem;font-weight:600;text-transform:uppercase;color:var(--text-muted)}
+.entry-rows{padding:7px 10px;display:flex;flex-direction:column;gap:4px}
+.entry-row{display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm)}
+.entry-row:hover{border-color:var(--border-2)}
+.entry-row.zone{background:rgba(30,136,229,.05);border-color:rgba(30,136,229,.2)}
+.entry-row.sl-row{background:rgba(239,83,80,.04);border-color:rgba(239,83,80,.18)}
+.entry-row-lbl{display:flex;align-items:center;gap:5px;font-size:.7rem;font-weight:500;color:var(--text-secondary)}
+.rr-tag{font-size:.57rem;font-weight:600;color:#90a4ff;background:rgba(41,98,255,.1);border:1px solid rgba(41,98,255,.18);padding:1px 4px;border-radius:99px}
+.entry-row-val{font-family:var(--font-mono);font-weight:700;font-size:.82rem}
+.entry-row-val.tp{color:var(--green)}
+.entry-row-val.sl{color:var(--red)}
+.entry-row-val.entry{color:#64b5f6;font-size:.75rem}
+.entry-status{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:var(--radius-sm);border:1px solid;margin-bottom:2px}
+.entry-status.es-enter{background:rgba(38,166,154,.06);border-color:rgba(38,166,154,.22)}
+.entry-status.es-near{background:rgba(249,168,37,.05);border-color:rgba(249,168,37,.22)}
+.entry-status.es-wait{background:rgba(30,136,229,.05);border-color:rgba(30,136,229,.18)}
+.entry-status.es-miss{background:rgba(239,83,80,.05);border-color:rgba(239,83,80,.18)}
+.es-emoji{font-size:.85rem;flex-shrink:0}
 .es-text{flex:1}
-.es-label{font-size:.76rem;font-weight:700}
-.entry-status.es-enter .es-label{color:#16a34a}
-.entry-status.es-near .es-label{color:#b45309}
-.entry-status.es-wait .es-label{color:#0369a1}
-.entry-status.es-miss .es-label{color:var(--red-600)}
-.es-sub{font-size:.66rem;color:var(--text-muted);margin-top:1px;font-family:var(--font-mono)}
-.es-pct{font-family:var(--font-mono);font-size:.75rem;font-weight:700;padding:2px 7px;border-radius:99px}
-.es-enter .es-pct{background:rgba(34,197,94,.15);color:#16a34a}
-.es-near .es-pct{background:rgba(245,158,11,.15);color:#b45309}
-.es-wait .es-pct{background:rgba(14,165,233,.12);color:#0369a1}
-.es-miss .es-pct{background:rgba(239,68,68,.12);color:var(--red-600)}
+.es-label{font-size:.7rem;font-weight:700}
+.entry-status.es-enter .es-label{color:var(--green)}
+.entry-status.es-near .es-label{color:var(--yellow)}
+.entry-status.es-wait .es-label{color:#64b5f6}
+.entry-status.es-miss .es-label{color:var(--red)}
+.es-sub{font-size:.6rem;color:var(--text-muted);margin-top:1px;font-family:var(--font-mono)}
+.es-pct{font-family:var(--font-mono);font-size:.65rem;font-weight:700;padding:2px 6px;border-radius:99px}
+.es-enter .es-pct{background:rgba(38,166,154,.14);color:var(--green)}
+.es-near .es-pct{background:rgba(249,168,37,.12);color:var(--yellow)}
+.es-wait .es-pct{background:rgba(30,136,229,.1);color:#64b5f6}
+.es-miss .es-pct{background:rgba(239,83,80,.1);color:var(--red)}
 
-/* PRICE ACTION PANEL */
-.pa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:.85rem 1rem}
-.pa-card{background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius-md);padding:9px 10px}
-.pa-card.pa-bull{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.25)}
-.pa-card.pa-bear{background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.25)}
-.pa-card.pa-neut{background:var(--gray-50);border-color:var(--border)}
-.pa-pattern{font-size:.72rem;font-weight:700;color:var(--text-primary);margin-bottom:3px}
-.pa-tf{font-size:.64rem;color:var(--text-muted);font-family:var(--font-mono)}
-.pa-dir{font-size:.64rem;font-weight:700;padding:1px 6px;border-radius:99px;margin-top:4px;display:inline-block}
-.pa-dir.bull{background:rgba(34,197,94,.12);color:var(--green-600)}
-.pa-dir.bear{background:rgba(239,68,68,.12);color:var(--red-600)}
-.pa-dir.neut{background:var(--gray-100);color:var(--gray-500)}
-.pa-empty{padding:1.5rem;text-align:center;color:var(--text-muted);font-size:.82rem}
+/* PRICE ACTION */
+.pa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:7px 10px}
+.pa-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 8px}
+.pa-card.pa-bull{background:rgba(38,166,154,.04);border-color:rgba(38,166,154,.18)}
+.pa-card.pa-bear{background:rgba(239,83,80,.04);border-color:rgba(239,83,80,.18)}
+.pa-pattern{font-size:.67rem;font-weight:600;color:var(--text-primary);margin-bottom:2px}
+.pa-tf{font-size:.58rem;color:var(--text-muted);font-family:var(--font-mono)}
+.pa-dir{font-size:.58rem;font-weight:700;padding:1px 5px;border-radius:99px;margin-top:3px;display:inline-block}
+.pa-dir.bull{background:rgba(38,166,154,.1);color:var(--green)}
+.pa-dir.bear{background:rgba(239,83,80,.1);color:var(--red)}
+.pa-dir.neut{background:var(--surface-3);color:var(--text-muted)}
+.pa-empty{padding:1.2rem;text-align:center;color:var(--text-muted);font-size:.72rem}
 
 /* CONFLUENCE TABLE */
-.conf-table{width:100%;border-collapse:collapse;font-size:.8rem}
-.conf-table th{padding:8px 9px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--gray-50)}
-.conf-table td{padding:9px 9px;border-bottom:1px solid var(--gray-100);vertical-align:middle}
+.conf-table{width:100%;border-collapse:collapse;font-size:.72rem}
+.conf-table th{padding:6px 9px;text-align:left;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2)}
+.conf-table td{padding:7px 9px;border-bottom:1px solid rgba(42,46,57,.5);vertical-align:middle}
 .conf-table tr:last-child td{border-bottom:none}
-.conf-table tr:hover td{background:var(--accent-light)}
-.tf-label{font-family:var(--font-mono);font-weight:700;font-size:.8rem;color:#0284c7}
-.tf-check{font-size:.85rem;font-weight:700}
-.tf-check.agree{color:var(--green-600)}
-.tf-check.disagree{color:var(--red-500)}
-.tf-check.skip{color:var(--text-muted)}
-.trend-badge{display:inline-flex;align-items:center;gap:3px;font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:99px}
-.trend-badge.bull{background:var(--green-50);color:var(--green-600);border:1px solid #bbf7d0}
-.trend-badge.bear{background:var(--red-50);color:var(--red-600);border:1px solid #fecaca}
-.trend-badge.neut{background:var(--gray-100);color:var(--gray-500);border:1px solid var(--border)}
-.sig-badge{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase}
-.sig-badge.strong-buy{background:var(--green-500);color:white}
-.sig-badge.buy{background:var(--green-50);color:var(--green-600);border:1px solid #86efac}
-.sig-badge.neutral{background:var(--gray-100);color:var(--gray-500);border:1px solid var(--border)}
-.sig-badge.sell{background:var(--red-50);color:var(--red-600);border:1px solid #fca5a5}
-.sig-badge.strong-sell{background:var(--red-500);color:white}
-.sig-badge.skip{background:var(--gray-100);color:var(--text-muted);border:1px dashed var(--border)}
+.conf-table tr:hover td{background:rgba(41,98,255,.025)}
+.tf-label{font-family:var(--font-mono);font-weight:700;font-size:.72rem;color:#64b5f6}
+.tf-check{font-size:.8rem;font-weight:700}
+.tf-check.agree{color:var(--green)}.tf-check.disagree{color:var(--red)}.tf-check.skip{color:var(--text-muted)}
+.trend-badge{display:inline-flex;align-items:center;gap:3px;font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:99px}
+.trend-badge.bull{background:rgba(38,166,154,.1);color:var(--green);border:1px solid rgba(38,166,154,.18)}
+.trend-badge.bear{background:rgba(239,83,80,.1);color:var(--red);border:1px solid rgba(239,83,80,.18)}
+.trend-badge.neut{background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border)}
+.sig-badge{display:inline-block;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:99px;text-transform:uppercase}
+.sig-badge.strong-buy{background:var(--green);color:#0d1117}
+.sig-badge.buy{background:rgba(38,166,154,.1);color:var(--green);border:1px solid rgba(38,166,154,.18)}
+.sig-badge.neutral{background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border)}
+.sig-badge.sell{background:rgba(239,83,80,.1);color:var(--red);border:1px solid rgba(239,83,80,.18)}
+.sig-badge.strong-sell{background:var(--red);color:white}
+.sig-badge.skip{background:var(--surface-2);color:var(--text-muted);border:1px dashed var(--border-2)}
 
-/* INDICATOR GRID */
-.ind-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;padding:.85rem 1rem}
-.micro{background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius-md);padding:9px 11px;display:flex;flex-direction:column;gap:4px}
-.micro-lbl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
-.micro-val{font-family:var(--font-mono);font-weight:600;font-size:.86rem;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center}
-.micro-det{font-size:.68rem;color:var(--text-muted);font-family:var(--font-mono)}
-.rsi-track{height:4px;background:var(--gray-200);border-radius:99px;position:relative;margin-top:3px}
-.rsi-mid{position:absolute;left:30%;right:30%;height:100%;background:var(--accent-light);border-radius:99px}
-.rsi-dot{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--accent);top:-1.5px;transform:translateX(-50%);border:1.5px solid white}
-.level-wrap{display:flex;flex-direction:column;gap:4px}
-.level-pill{display:flex;justify-content:space-between;align-items:center;padding:3px 7px;border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:.7rem;font-weight:600}
-.level-pill.res{background:var(--red-50);color:var(--red-600);border:1px solid #fecaca}
-.level-pill.sup{background:var(--green-50);color:var(--green-600);border:1px solid #bbf7d0}
+/* INDICATORS */
+.ind-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;padding:7px 10px}
+.micro{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 9px;display:flex;flex-direction:column;gap:3px}
+.micro-lbl{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+.micro-val{font-family:var(--font-mono);font-weight:600;font-size:.77rem;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center}
+.micro-det{font-size:.6rem;color:var(--text-muted);font-family:var(--font-mono)}
+.rsi-track{height:3px;background:var(--surface-3);border-radius:99px;position:relative;margin-top:2px}
+.rsi-mid{position:absolute;left:30%;right:30%;height:100%;background:rgba(120,123,134,.25);border-radius:99px}
+.rsi-dot{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--blue-light);top:-1.5px;transform:translateX(-50%);border:1px solid var(--bg)}
+.level-wrap{display:flex;flex-direction:column;gap:3px}
+.level-pill{display:flex;justify-content:space-between;align-items:center;padding:2px 6px;border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:.62rem;font-weight:600}
+.level-pill.res{background:rgba(239,83,80,.07);color:var(--red);border:1px solid rgba(239,83,80,.14)}
+.level-pill.sup{background:rgba(38,166,154,.07);color:var(--green);border:1px solid rgba(38,166,154,.14)}
 
-/* SMC PANEL */
-.smc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:.85rem 1rem}
-.smc-card{background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius-md);padding:9px 10px;display:flex;flex-direction:column;gap:4px}
-.smc-card-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
-.smc-card-val{font-size:.78rem;font-weight:700;color:var(--text-primary)}
-.smc-card-val.bull{color:var(--green-600)}
-.smc-card-val.bear{color:var(--red-600)}
-.smc-tag{font-size:.64rem;font-weight:700;padding:2px 7px;border-radius:99px;display:inline-block;margin-top:2px}
-.smc-tag.bull{background:rgba(34,197,94,.12);color:var(--green-600)}
-.smc-tag.bear{background:rgba(239,68,68,.12);color:var(--red-600)}
-.smc-tag.neut{background:var(--gray-100);color:var(--gray-500)}
+/* SMC */
+.smc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:7px 10px}
+.smc-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 8px;display:flex;flex-direction:column;gap:3px}
+.smc-card-title{font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+.smc-card-val{font-size:.7rem;font-weight:700;color:var(--text-primary)}
+.smc-card-val.bull{color:var(--green)}.smc-card-val.bear{color:var(--red)}
+.smc-tag{font-size:.58rem;font-weight:700;padding:1px 5px;border-radius:99px;display:inline-block;margin-top:1px}
+.smc-tag.bull{background:rgba(38,166,154,.1);color:var(--green)}
+.smc-tag.bear{background:rgba(239,83,80,.1);color:var(--red)}
+.smc-tag.neut{background:var(--surface-3);color:var(--text-muted)}
 
 /* SUMMARY */
-.summary-panel{background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
-.summary-body{padding:.9rem 1rem;display:flex;flex-direction:column;gap:.8rem}
-.summary-text{font-size:.86rem;line-height:1.65;color:var(--text-secondary);background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:.8rem .9rem}
-.btn-telegram{display:flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(135deg,#0088cc,#0099dd);color:white;border:none;border-radius:var(--radius-md);padding:11px 14px;font-family:var(--font-sans);font-size:.88rem;font-weight:600;cursor:pointer;transition:var(--t);box-shadow:0 2px 8px rgba(0,136,204,.25)}
-.btn-telegram:hover{background:linear-gradient(135deg,#0099dd,#00aaee);box-shadow:0 4px 14px rgba(0,136,204,.35);transform:translateY(-1px)}
-.btn-telegram:disabled{opacity:.7;cursor:not-allowed;transform:none}
+.summary-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+.summary-body{padding:9px 10px;display:flex;flex-direction:column;gap:8px}
+.summary-text{font-size:.75rem;line-height:1.65;color:var(--text-secondary);background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--blue-light);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:.7rem .85rem}
+.btn-telegram{display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,#0088cc,#0099dd);color:white;border:none;border-radius:var(--radius-md);padding:8px 14px;font-family:var(--font-sans);font-size:.77rem;font-weight:600;transition:var(--t)}
+.btn-telegram:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.btn-telegram:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
-/* SETTINGS MODAL */
-.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem}
-.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);width:100%;max-width:400px;box-shadow:var(--shadow-lg);overflow:hidden}
-.modal-head{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid var(--border);background:var(--gray-50)}
-.modal-title{font-size:.95rem;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:7px}
-.modal-close{width:28px;height:28px;background:var(--gray-100);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);transition:var(--t)}
-.modal-close:hover{background:var(--red-50);color:var(--red-500)}
-.modal-body{padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:1rem}
-.form-group{display:flex;flex-direction:column;gap:5px}
-.form-label{font-size:.78rem;font-weight:600;color:var(--text-secondary)}
-.form-input{width:100%;padding:8px 11px;background:var(--gray-50);border:1.5px solid var(--border);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:.86rem;color:var(--text-primary);outline:none;transition:var(--t)}
-.form-input:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px rgba(14,165,233,.08)}
-.form-hint{font-size:.73rem;color:var(--text-muted);line-height:1.5}
-.form-hint a{color:#0284c7;text-decoration:none}
-.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:.8rem;background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius-md)}
-.toggle-info{display:flex;flex-direction:column;gap:2px}
-.toggle-title{font-size:.83rem;font-weight:600;color:var(--text-primary)}
-.toggle-desc{font-size:.73rem;color:var(--text-muted)}
-.toggle-sw{position:relative;width:42px;height:23px;cursor:pointer}
-.toggle-sw input{opacity:0;width:0;height:0}
-.toggle-track{position:absolute;inset:0;background:var(--gray-200);border-radius:99px;transition:var(--t);border:1px solid var(--border)}
-.toggle-sw input:checked + .toggle-track{background:var(--accent);border-color:var(--accent)}
-.toggle-track::after{content:'';position:absolute;left:3px;top:50%;transform:translateY(-50%);width:15px;height:15px;background:white;border-radius:50%;transition:var(--t);box-shadow:var(--shadow-sm)}
-.toggle-sw input:checked + .toggle-track::after{left:calc(100% - 18px)}
-.modal-footer{display:flex;gap:7px;padding:.9rem 1.25rem;border-top:1px solid var(--border);background:var(--gray-50)}
-.btn-ghost{flex:1;padding:9px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:.83rem;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--t)}
-.btn-ghost:hover{background:var(--gray-50);color:var(--text-primary)}
-.btn-primary{flex:1;padding:9px;background:var(--accent);border:none;border-radius:var(--radius-md);font-family:var(--font-sans);font-size:.83rem;font-weight:600;color:white;cursor:pointer;transition:var(--t);box-shadow:0 2px 6px rgba(14,165,233,.3)}
-.btn-primary:hover{background:var(--accent-hover)}
-
-/* NEWS PAGE */
-.news-page{display:grid;grid-template-columns:1fr 340px;gap:1rem;align-items:start}
+/* ===== NEWS PAGE ===== */
+.news-page{display:grid;grid-template-columns:1fr 310px;gap:7px;padding:8px;align-items:start}
 @media(max-width:1100px){.news-page{grid-template-columns:1fr}}
-.news-panel,.cal-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;box-shadow:var(--shadow-sm)}
-.news-panel-head{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.1rem;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(124,58,237,.05),rgba(14,165,233,.03));flex-wrap:wrap;gap:8px}
-.news-panel-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-secondary);display:flex;align-items:center;gap:7px}
-.news-dot{width:7px;height:7px;border-radius:50%;background:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.15)}
-.news-filter-tabs{display:flex;gap:3px;background:var(--gray-100);border-radius:var(--radius-md);padding:3px}
-.news-filter-btn{background:transparent;border:none;border-radius:var(--radius-sm);padding:4px 10px;font-family:var(--font-sans);font-size:.72rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:var(--t)}
-.news-filter-btn.active{background:var(--surface);color:#7c3aed;box-shadow:var(--shadow-sm)}
-.news-list{display:flex;flex-direction:column;max-height:calc(100vh - 280px);overflow-y:auto}
+.news-panel,.cal-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+.news-panel-head{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:5px}
+.news-panel-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-secondary);display:flex;align-items:center;gap:5px}
+.news-dot{width:6px;height:6px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 2px rgba(124,58,237,.18)}
+.news-filter-tabs{display:flex;gap:2px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:2px}
+.news-filter-btn{background:transparent;border:none;border-radius:var(--radius-sm);padding:3px 8px;font-family:var(--font-sans);font-size:.65rem;font-weight:500;color:var(--text-muted);transition:var(--t)}
+.news-filter-btn.active{background:var(--purple);color:white}
+.news-list{display:flex;flex-direction:column;max-height:calc(100vh - 220px);overflow-y:auto}
 .news-list::-webkit-scrollbar{width:3px}
-.news-list::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:99px}
-.news-item{display:flex;gap:12px;padding:13px 15px;border-bottom:1px solid var(--gray-100);transition:background .15s;cursor:pointer;text-decoration:none;color:inherit}
+.news-list::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:2px}
+.news-item{display:flex;gap:9px;padding:9px 10px;border-bottom:1px solid rgba(42,46,57,.45);transition:background .1s;cursor:pointer}
 .news-item:last-child{border-bottom:none}
-.news-item:hover{background:rgba(124,58,237,.03)}
-.news-sent-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.news-sent-dot.bullish{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
-.news-sent-dot.bearish{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.15)}
-.news-sent-dot.neutral{background:var(--gray-400)}
+.news-item:hover{background:var(--surface-2)}
+.news-sent-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.news-sent-dot.bullish{background:var(--green)}.news-sent-dot.bearish{background:var(--red)}.news-sent-dot.neutral{background:var(--text-muted)}
 .news-content{flex:1;min-width:0}
-.news-title-s{font-size:.82rem;font-weight:600;color:var(--text-primary);line-height:1.45;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.news-meta-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.news-source-s{font-size:.7rem;font-weight:600;color:#7c3aed;background:rgba(124,58,237,.07);padding:2px 7px;border-radius:99px}
-.news-time-s{font-size:.7rem;color:var(--text-muted);font-family:var(--font-mono)}
-.news-badge-s{font-size:.63rem;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase}
-.news-badge-s.bullish{background:rgba(34,197,94,.1);color:#16a34a;border:1px solid rgba(34,197,94,.2)}
-.news-badge-s.bearish{background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2)}
-.news-badge-s.neutral{background:var(--gray-100);color:var(--gray-500);border:1px solid var(--gray-200)}
-.news-refresh-btn{display:flex;align-items:center;gap:4px;background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius-md);padding:5px 10px;font-family:var(--font-sans);font-size:.72rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:var(--t)}
-.news-refresh-btn:hover{color:#7c3aed;border-color:rgba(124,58,237,.3)}
-.news-refresh-btn svg{width:12px;height:12px}
+.news-title-s{font-size:.74rem;font-weight:500;color:var(--text-primary);line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-meta-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.news-source-s{font-size:.62rem;font-weight:600;color:var(--purple);background:rgba(124,58,237,.07);padding:1px 5px;border-radius:99px}
+.news-time-s{font-size:.62rem;color:var(--text-muted);font-family:var(--font-mono)}
+.news-badge-s{font-size:.56rem;font-weight:700;padding:1px 5px;border-radius:99px;text-transform:uppercase;border:1px solid}
+.news-badge-s.bullish{background:rgba(38,166,154,.09);color:var(--green);border-color:rgba(38,166,154,.14)}
+.news-badge-s.bearish{background:rgba(239,83,80,.09);color:var(--red);border-color:rgba(239,83,80,.14)}
+.news-badge-s.neutral{background:var(--surface-2);color:var(--text-muted);border-color:var(--border)}
+.news-refresh-btn{display:flex;align-items:center;gap:3px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:4px 8px;font-family:var(--font-sans);font-size:.65rem;font-weight:500;color:var(--text-muted);transition:var(--t)}
+.news-refresh-btn:hover{color:var(--purple);border-color:rgba(124,58,237,.3)}
+.news-refresh-btn svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5}
 .news-refresh-btn.spinning svg{animation:spin .8s linear infinite}
-.skel{background:linear-gradient(90deg,var(--gray-100) 25%,var(--gray-50) 50%,var(--gray-100) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.news-empty{padding:2.5rem;text-align:center;color:var(--text-muted);font-size:.83rem}
-.cal-head{padding:.9rem 1.1rem;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(217,119,6,.05),transparent)}
-.cal-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-secondary);display:flex;align-items:center;gap:7px}
-.cal-dot{width:7px;height:7px;border-radius:50%;background:#d97706;box-shadow:0 0 0 3px rgba(217,119,6,.15)}
-.cal-list{display:flex;flex-direction:column;max-height:calc(100vh - 280px);overflow-y:auto}
-.cal-day-label{padding:5px 13px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);background:var(--gray-50);border-bottom:1px solid var(--gray-100);position:sticky;top:0;z-index:1}
-.cal-day-label.today{color:#d97706;background:rgba(217,119,6,.06)}
-.cal-day-label.tomorrow{color:#0284c7;background:rgba(14,165,233,.05)}
-.cal-event{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;border-bottom:1px solid var(--gray-100);transition:background .15s}
-.cal-event:hover{background:var(--gray-50)}
-.cal-imp{width:6px;flex-shrink:0;margin-top:3px}
-.cal-imp-dot{width:6px;height:6px;border-radius:50%}
-.cal-imp.high .cal-imp-dot{background:#ef4444}
-.cal-imp.medium .cal-imp-dot{background:#f59e0b}
-.cal-imp.low .cal-imp-dot{background:#94a3b8}
+.news-empty{padding:1.8rem;text-align:center;color:var(--text-muted);font-size:.75rem}
+.cal-head{padding:7px 10px;border-bottom:1px solid var(--border)}
+.cal-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-secondary);display:flex;align-items:center;gap:5px}
+.cal-dot{width:6px;height:6px;border-radius:50%;background:var(--yellow)}
+.cal-list{display:flex;flex-direction:column;max-height:calc(100vh - 220px);overflow-y:auto}
+.cal-day-label{padding:3px 10px;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);background:var(--surface-2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1}
+.cal-day-label.today{color:var(--yellow);background:rgba(249,168,37,.05)}
+.cal-day-label.tomorrow{color:#64b5f6;background:rgba(30,136,229,.05)}
+.cal-event{display:flex;align-items:flex-start;gap:7px;padding:7px 10px;border-bottom:1px solid rgba(42,46,57,.35);transition:background .1s}
+.cal-event:hover{background:var(--surface-2)}
+.cal-imp{width:5px;flex-shrink:0;margin-top:3px}
+.cal-imp-dot{width:5px;height:5px;border-radius:50%}
+.cal-imp.high .cal-imp-dot{background:var(--red)}.cal-imp.medium .cal-imp-dot{background:var(--yellow)}.cal-imp.low .cal-imp-dot{background:var(--text-muted)}
 .cal-cnt{flex:1;min-width:0}
-.cal-ev-name{font-size:.78rem;font-weight:600;color:var(--text-primary);margin-bottom:3px}
-.cal-ev-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.cal-country{font-size:.66rem;font-weight:600;color:var(--text-muted)}
-.cal-time{font-size:.66rem;font-family:var(--font-mono);color:var(--text-muted)}
-.cal-imp-label{font-size:.63rem;font-weight:700;padding:1px 6px;border-radius:99px}
-.cal-imp.high .cal-imp-label{background:rgba(239,68,68,.1);color:#dc2626}
-.cal-imp.medium .cal-imp-label{background:rgba(245,158,11,.1);color:#d97706}
-.cal-vals{display:flex;gap:7px;margin-top:3px}
-.cal-val{font-size:.66rem;font-family:var(--font-mono)}
+.cal-ev-name{font-size:.72rem;font-weight:500;color:var(--text-primary);margin-bottom:2px}
+.cal-ev-meta{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.cal-country{font-size:.6rem;font-weight:600;color:var(--text-muted)}
+.cal-time{font-size:.6rem;font-family:var(--font-mono);color:var(--text-muted)}
+.cal-imp-label{font-size:.56rem;font-weight:700;padding:1px 5px;border-radius:99px}
+.cal-imp.high .cal-imp-label{background:rgba(239,83,80,.1);color:var(--red)}.cal-imp.medium .cal-imp-label{background:rgba(249,168,37,.1);color:var(--yellow)}
+.cal-vals{display:flex;gap:5px;margin-top:2px}
+.cal-val{font-size:.6rem;font-family:var(--font-mono)}
 .cal-val-lbl{color:var(--text-muted);margin-right:2px}
-.cal-val-actual{color:var(--green-600);font-weight:700}
-.cal-val-forecast{color:#0284c7}
-.cal-val-prev{color:var(--text-muted)}
+.cal-val-actual{color:var(--green);font-weight:700}.cal-val-forecast{color:#64b5f6}.cal-val-prev{color:var(--text-muted)}
 
-/* NEWS DETAIL MODAL */
-.news-detail-modal{max-width:620px!important}
-.news-detail-banner{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-radius:var(--radius-md);margin-bottom:14px;border:1px solid;font-size:.83rem;font-weight:600}
-.news-detail-banner.bullish{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.25);color:var(--green-600)}
-.news-detail-banner.bearish{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.25);color:var(--red-600)}
-.news-detail-banner.neutral{background:var(--gray-50);border-color:var(--border);color:var(--text-secondary)}
-.news-detail-title{font-size:1.2rem;font-weight:700;line-height:1.4;color:var(--text-primary);margin-bottom:9px}
-.news-detail-meta{font-size:.73rem;color:var(--text-muted);margin-bottom:18px;font-family:var(--font-mono)}
-.news-detail-content{font-size:.86rem;line-height:1.6;color:var(--gray-700);max-height:40vh;overflow-y:auto;padding-right:6px;border-top:1px solid var(--border);padding-top:14px}
-.news-detail-content p{margin-bottom:10px}
-.news-detail-content a{color:#0284c7;text-decoration:none}
+/* ===== MODAL ===== */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-box{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius-xl);width:100%;max-width:370px;box-shadow:var(--shadow-lg);overflow:hidden}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1rem;border-bottom:1px solid var(--border);background:var(--surface-2)}
+.modal-title{font-size:.82rem;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:6px}
+.modal-close{width:22px;height:22px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:var(--t)}
+.modal-close:hover{background:rgba(239,83,80,.1);color:var(--red);border-color:rgba(239,83,80,.3)}
+.modal-close svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5}
+.modal-body{padding:.9rem 1rem;display:flex;flex-direction:column;gap:.8rem}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-label{font-size:.7rem;font-weight:600;color:var(--text-secondary)}
+.form-input{width:100%;padding:6px 9px;background:var(--bg);border:1px solid var(--border-2);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:.78rem;color:var(--text-primary);outline:none;transition:var(--t)}
+.form-input:focus{border-color:var(--blue-light);box-shadow:0 0 0 2px rgba(30,136,229,.1)}
+.form-hint{font-size:.65rem;color:var(--text-muted);line-height:1.5}
+.form-hint a{color:#64b5f6}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:.65rem .85rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md)}
+.toggle-info{display:flex;flex-direction:column;gap:2px}
+.toggle-title{font-size:.75rem;font-weight:600;color:var(--text-primary)}
+.toggle-desc{font-size:.65rem;color:var(--text-muted)}
+.toggle-sw{position:relative;width:34px;height:18px}
+.toggle-sw input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:var(--surface-3);border-radius:99px;transition:var(--t);border:1px solid var(--border-2)}
+.toggle-sw input:checked+.toggle-track{background:var(--blue-light);border-color:var(--blue-light)}
+.toggle-track::after{content:'';position:absolute;left:2px;top:50%;transform:translateY(-50%);width:12px;height:12px;background:white;border-radius:50%;transition:var(--t)}
+.toggle-sw input:checked+.toggle-track::after{left:calc(100% - 14px)}
+.modal-footer{display:flex;gap:5px;padding:.75rem 1rem;border-top:1px solid var(--border);background:var(--surface-2)}
+.btn-ghost{flex:1;padding:7px;background:var(--bg);border:1px solid var(--border-2);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:.75rem;font-weight:600;color:var(--text-secondary);transition:var(--t)}
+.btn-ghost:hover{background:var(--surface-3);color:var(--text-primary)}
+.btn-primary{flex:1;padding:7px;background:var(--blue-light);border:none;border-radius:var(--radius-md);font-family:var(--font-sans);font-size:.75rem;font-weight:600;color:white;transition:var(--t)}
+.btn-primary:hover{filter:brightness(1.1)}
+.news-detail-modal{max-width:560px!important}
+.news-detail-banner{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:var(--radius-md);margin-bottom:11px;border:1px solid;font-size:.75rem;font-weight:600}
+.news-detail-banner.bullish{background:rgba(38,166,154,.06);border-color:rgba(38,166,154,.2);color:var(--green)}
+.news-detail-banner.bearish{background:rgba(239,83,80,.06);border-color:rgba(239,83,80,.2);color:var(--red)}
+.news-detail-banner.neutral{background:var(--surface-2);border-color:var(--border);color:var(--text-secondary)}
+.news-detail-title{font-size:.95rem;font-weight:700;line-height:1.4;color:var(--text-primary);margin-bottom:7px}
+.news-detail-meta{font-size:.65rem;color:var(--text-muted);margin-bottom:14px;font-family:var(--font-mono)}
+.news-detail-content{font-size:.77rem;line-height:1.65;color:var(--text-secondary);max-height:38vh;overflow-y:auto;padding-right:5px;border-top:1px solid var(--border);padding-top:11px}
+.news-detail-content p{margin-bottom:8px}
+.news-detail-content a{color:#64b5f6}
 
-/* TOASTS */
-.toast-container{position:fixed;bottom:18px;right:18px;z-index:999;display:flex;flex-direction:column;gap:7px}
-.toast{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:9px 14px;font-size:.83rem;font-weight:500;color:var(--text-primary);box-shadow:var(--shadow-lg);min-width:250px;max-width:340px;animation:toast-in .3s cubic-bezier(.4,0,.2,1) forwards;border-left:3px solid var(--accent)}
-.toast.success{border-left-color:var(--green-500)}
-.toast.error{border-left-color:var(--red-500)}
-.toast.warning{border-left-color:var(--amber-500)}
-@keyframes toast-in{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
+/* ===== TOASTS ===== */
+.toast-container{position:fixed;bottom:14px;right:14px;z-index:999;display:flex;flex-direction:column;gap:5px}
+.toast{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--radius-md);padding:7px 11px;font-size:.75rem;font-weight:500;color:var(--text-primary);box-shadow:var(--shadow-lg);min-width:200px;max-width:300px;animation:toast-in .22s ease forwards;border-left:2px solid var(--blue-light)}
+.toast.success{border-left-color:var(--green)}.toast.error{border-left-color:var(--red)}.toast.warning{border-left-color:var(--yellow)}
+@keyframes toast-in{from{transform:translateX(50px);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* MOBILE */
+/* ===== MOBILE ===== */
 @media(max-width:768px){
-  .app{padding:.5rem;gap:.75rem}
-  .header{border-radius:var(--radius-lg);padding:.65rem .9rem}
-  .clock-pill{display:none}
-  .dashboard-grid{display:block}
-  .sidebar{position:fixed!important;top:0;left:-300px;bottom:0;width:280px;z-index:1000;border-radius:0;transition:left .3s ease;max-height:100vh!important}
-  .sidebar.open{left:0}
-  .sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;backdrop-filter:blur(2px)}
-  .results-grid{grid-template-columns:1fr!important;gap:.75rem}
-  .chart-wrap{height:280px}
+  .header-left{padding:0 8px;gap:7px}
+  .header-right .clock-pill{display:none}
+  .body-layout{position:relative}
+  .sidebar{
+    position:fixed!important;top:48px;left:-250px;bottom:0;
+    width:236px;z-index:998;border-radius:0;
+    transition:left .22s ease;box-shadow:none;
+  }
+  .sidebar.open{left:0;box-shadow:var(--shadow-lg)}
+  .main-content{overflow-y:auto}
+  .results-grid{grid-template-columns:1fr!important;gap:6px}
+  .chart-wrap{height:250px}
   .pa-grid,.smc-grid{grid-template-columns:repeat(2,1fr)!important}
-  .main-nav{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
-  .main-nav::-webkit-scrollbar{height:0}
   .mobile-menu-btn{display:flex!important}
+  .news-page{grid-template-columns:1fr;padding:6px;gap:6px}
+  .results-body{padding:6px;gap:6px}
 }
-@media(min-width:769px){.mobile-menu-btn{display:none!important}.sb-overlay{display:none!important}}
+@media(min-width:769px){
+  .mobile-menu-btn{display:none!important}
+  .sb-overlay{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -481,30 +534,32 @@ body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans)
 
   <!-- HEADER -->
   <header class="header">
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div class="header-left">
       <button class="btn-icon mobile-menu-btn" @click="sidebarOpen=true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <div class="logo">
         <div class="logo-mark"><img src="kyysis_logo.png" alt="KyySIS" onerror="this.style.display='none'"></div>
-        <span class="logo-text">Kyy<span>SIS</span></span>
+        <span class="logo-text">Kyy<em>SIS</em></span>
         <span class="logo-badge">FUTURES v3.0</span>
       </div>
     </div>
-    <nav class="main-nav">
+
+    <nav class="header-nav">
       <button :class="['nav-tab',{active:page==='dashboard'}]" @click="page='dashboard';sidebarOpen=false">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
         Dashboard
       </button>
-      <button :class="['nav-tab',{active:page==='news',  'active-news':page==='news'}]" @click="page='news';loadNews();sidebarOpen=false">
+      <button :class="['nav-tab',{active:page==='news','active-news':page==='news'}]" @click="page='news';loadNews();sidebarOpen=false">
         <svg viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z"/></svg>
-        📰 News & Events
-        <span v-if="newsItems.length>0" style="background:#7c3aed;color:white;font-size:.58rem;font-weight:700;padding:1px 6px;border-radius:99px">{{newsItems.length}}</span>
+        📰 News &amp; Events
+        <span v-if="newsItems.length>0" class="nav-tab-count">{{newsItems.length}}</span>
       </button>
     </nav>
+
     <div class="header-right">
       <div class="clock-pill">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         {{liveTime}}
       </div>
       <div class="status-pill">
@@ -512,21 +567,19 @@ body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans)
         <span>{{apiOnline?'Binance Live':'Offline'}}</span>
       </div>
       <button class="btn-icon" @click="settingsVisible=true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
       </button>
     </div>
   </header>
 
-  <!-- DASHBOARD -->
-  <div class="dashboard-grid" v-show="page==='dashboard'">
-    <div class="sb-overlay" v-if="sidebarOpen" @click="sidebarOpen=false"></div>
-    <div :class="['sidebar',{open:sidebarOpen}]">
+  <!-- BODY LAYOUT -->
+  <div class="body-layout">
+
+    <!-- SIDEBAR / WATCHLIST -->
+    <div :class="['sidebar',{open:sidebarOpen}]" v-show="page==='dashboard'||sidebarOpen">
       <div class="sb-head">
-        <div>
-          <div class="sb-title">Markets</div>
-          <div class="sb-exchange">Binance Futures</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px">
+        <span class="sb-title">Watchlist</span>
+        <div class="sb-meta">
           <div class="live-pill">
             <div class="live-dot"></div>
             <span class="live-text">Live</span>
@@ -536,7 +589,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans)
       </div>
       <div class="sb-search">
         <div class="search-wrap">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input v-model="search" placeholder="Search markets…">
         </div>
       </div>
@@ -549,14 +602,14 @@ body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans)
              :class="['coin-card',prices[coin.symbol]?.chg>=0?'pos':'neg',{active:activeSym===coin.symbol}]"
              @click="selectCoin(coin.symbol)">
           <span class="coin-rank">{{i+1}}</span>
-          <div :class="'coin-avatar'" :style="avatarStyle(coin.symbol)">{{coin.symbol==='PAXGUSDT'?'G':coin.symbol.replace('USDT','')[0]}}</div>
+          <div class="coin-avatar" :style="avatarStyle(coin.symbol)">{{coin.symbol==='PAXGUSDT'?'G':coin.symbol.replace('USDT','')[0]}}</div>
           <div class="coin-info">
             <div class="coin-sym">{{fmtSym(coin.symbol)}}</div>
             <div class="coin-name-s">{{coin.name.split(' / ')[0]}}</div>
           </div>
           <div class="coin-spark">
             <div v-for="(h,bi) in sparkline(coin.symbol,prices[coin.symbol]?.chg)" :key="bi" class="spark-bar"
-                 :style="{height:h+'px',background:prices[coin.symbol]?.chg>=0?`rgba(34,197,94,${.3+bi*.1})`:`rgba(239,68,68,${.3+bi*.1})`}"></div>
+                 :style="{height:h+'px',background:prices[coin.symbol]?.chg>=0?`rgba(38,166,154,${.3+bi*.1})`:`rgba(239,83,80,${.3+bi*.1})`}"></div>
           </div>
           <div class="coin-prices">
             <span class="coin-price">{{fmtPrice(prices[coin.symbol]?.price)}}</span>
@@ -567,455 +620,452 @@ body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans)
         </div>
       </div>
       <div class="sb-footer" v-if="marketsLoaded">
-        <div class="sb-stat"><span class="sb-stat-val" style="color:#22c55e">{{bullCount}}</span><span class="sb-stat-lbl">Bull</span></div>
+        <div class="sb-stat"><span class="sb-stat-val" style="color:var(--green)">{{bullCount}}</span><span class="sb-stat-lbl">Bull</span></div>
         <div class="sb-divider"></div>
-        <div class="sb-stat"><span class="sb-stat-val" style="color:rgba(255,255,255,.5)">{{SYMBOLS.length}}</span><span class="sb-stat-lbl">Pairs</span></div>
+        <div class="sb-stat"><span class="sb-stat-val" style="color:var(--text-secondary)">{{SYMBOLS.length}}</span><span class="sb-stat-lbl">Pairs</span></div>
         <div class="sb-divider"></div>
-        <div class="sb-stat"><span class="sb-stat-val" style="color:#ef4444">{{bearCount}}</span><span class="sb-stat-lbl">Bear</span></div>
+        <div class="sb-stat"><span class="sb-stat-val" style="color:var(--red)">{{bearCount}}</span><span class="sb-stat-lbl">Bear</span></div>
       </div>
     </div>
 
-    <!-- MAIN PANEL -->
-    <div class="main-panel">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
 
-      <!-- EMPTY -->
-      <div v-if="appState==='empty'" class="state-empty">
-        <div class="empty-icon">
-          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/><line x1="50" y1="5" x2="50" y2="95"/><line x1="5" y1="50" x2="95" y2="50"/><circle cx="50" cy="50" r="20" stroke-width="2"/></svg>
-        </div>
-        <div class="empty-title">Select a Market to Analyze</div>
-        <div class="empty-desc">Engine akan menganalisa 5 timeframe (1D · 4H · 2H · 1H · 15M) dengan 4 metode: SMC, Price Action, Volume Profile, dan Multi-TF Confluence. <strong>Minimal 4 dari 5 TF harus sepakat</strong> sebelum signal dikeluarkan.</div>
-        <div class="empty-hint">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Tip: Go to Settings to connect your Telegram Bot for alerts
-        </div>
-      </div>
+      <!-- ========== DASHBOARD ========== -->
+      <div v-show="page==='dashboard'">
+        <div class="sb-overlay" v-if="sidebarOpen" @click="sidebarOpen=false"></div>
 
-      <!-- SCANNING -->
-      <div v-if="appState==='scanning'" class="state-scanning">
-        <div class="scan-loader">
-          <div class="scan-ring scan-ring-outer"></div>
-          <div class="scan-ring scan-ring-inner"></div>
-          <div class="scan-center"></div>
-        </div>
-        <div class="scan-title">Analyzing {{fmtSym(activeSym)}}…</div>
-        <div class="scan-prog-wrap">
-          <div class="scan-prog-track"><div class="scan-prog-fill" :style="{width:scanPct+'%'}"></div></div>
-          <div class="scan-pct">{{scanPct}}%</div>
-        </div>
-        <div class="scan-console" ref="scanConsole">
-          <div v-for="l in scanLogs" :class="['con-line',l.t]">
-            <span>{{l.t==='ok'?'[✓]':l.t==='info'?'[!]':'[*]'}}</span><span>{{l.msg}}</span>
+        <!-- EMPTY STATE -->
+        <div v-if="appState==='empty'" class="state-empty">
+          <div class="empty-icon">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/><line x1="50" y1="5" x2="50" y2="95"/><line x1="5" y1="50" x2="95" y2="50"/><circle cx="50" cy="50" r="20" stroke-width="2"/></svg>
+          </div>
+          <div class="empty-title">Select a Market to Analyze</div>
+          <div class="empty-desc">Engine menganalisa 5 timeframe (1D · 4H · 2H · 1H · 15M) dengan 4 metode: SMC, Price Action, Volume Profile, dan Multi-TF Confluence. <strong>Minimal 4 dari 5 TF harus sepakat</strong> sebelum signal dikeluarkan.</div>
+          <div class="empty-hint">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Tip: Go to Settings to connect your Telegram Bot for alerts
           </div>
         </div>
-      </div>
 
-      <!-- RESULTS -->
-      <div v-if="appState==='results' && analysis" class="state-results" :class="{active:resultsActive}">
-
-        <!-- RESULT HEADER -->
-        <div class="result-header">
-          <div class="result-id">
-            <div class="result-avatar">{{analysis.symbol==='PAXGUSDT'?'G':analysis.symbol.replace('USDT','')[0]}}</div>
-            <div>
-              <div class="result-pair">{{fmtSym(analysis.symbol)}}</div>
-              <div class="result-full">{{analysis.fullName}}</div>
+        <!-- SCANNING STATE -->
+        <div v-if="appState==='scanning'" class="state-scanning">
+          <div class="scan-loader">
+            <div class="scan-ring scan-ring-outer"></div>
+            <div class="scan-ring scan-ring-inner"></div>
+            <div class="scan-center"></div>
+          </div>
+          <div class="scan-title">Analyzing {{fmtSym(activeSym)}}…</div>
+          <div class="scan-prog-wrap">
+            <div class="scan-prog-track"><div class="scan-prog-fill" :style="{width:scanPct+'%'}"></div></div>
+            <div class="scan-pct">{{scanPct}}%</div>
+          </div>
+          <div class="scan-console" ref="scanConsole">
+            <div v-for="l in scanLogs" :class="['con-line',l.t]">
+              <span>{{l.t==='ok'?'[✓]':l.t==='info'?'[!]':'[*]'}}</span><span>{{l.msg}}</span>
             </div>
           </div>
-          <div class="result-ticker">
-            <div class="ticker-item">
-              <div class="ticker-lbl">Price</div>
-              <div class="ticker-val">{{fmtPrice(analysis.price)}}</div>
-            </div>
-            <div class="ticker-item">
-              <div class="ticker-lbl">24h Change</div>
-              <div :class="['ticker-val',analysis.chgPct>=0?'up':'dn']">{{fmtPrice(analysis.chgPct,true)}}</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <div :class="['signal-badge',sigClass(analysis.signal)]">
-              {{analysis.signal}} {{analysis.sigEmoji}}
-            </div>
-            <button class="btn-refresh" @click="reanalyze">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
-              Re-analyze
-            </button>
-          </div>
         </div>
 
-        <!-- CONFLUENCE GATE BANNER -->
-        <div :class="['conf-gate', analysis.gatePass?'pass': analysis.tfAgreements<2?'locked':'fail']">
-          <span class="conf-gate-icon">{{analysis.gatePass?'✅':analysis.tfAgreements<2?'🔒':'⚠️'}}</span>
-          <div class="conf-gate-text">
-            <strong>Multi-TF Confluence Gate</strong> —
-            <span v-if="analysis.gatePass">{{analysis.tfAgreements}}/5 timeframe sepakat → Signal VALID dan dapat dipercaya</span>
-            <span v-else-if="analysis.tfAgreements>=3">{{analysis.tfAgreements}}/5 TF sepakat — butuh minimal 4. Tunggu konfirmasi tambahan.</span>
-            <span v-else>Hanya {{analysis.tfAgreements}}/5 TF sepakat — sinyal <strong>TIDAK VALID</strong>. Jangan entry sekarang.</span>
-          </div>
-          <span class="conf-gate-count">{{analysis.tfAgreements}}/5 TF</span>
-        </div>
+        <!-- RESULTS STATE -->
+        <div v-if="appState==='results' && analysis" class="state-results" :class="{active:resultsActive}">
 
-        <!-- STRATEGY BAR -->
-        <div class="strategy-bar">
-          <span class="strategy-label">Strategy Mode</span>
-          <div class="strategy-btns">
-            <button :class="['btn-strat',{active:profile==='scalping'}]" @click="changeProfile('scalping')">⚡ Scalping</button>
-            <button :class="['btn-strat',{active:profile==='intraday'}]" @click="changeProfile('intraday')">📊 Intraday</button>
-            <button :class="['btn-strat',{active:profile==='swing'}]"    @click="changeProfile('swing')">📈 Swing</button>
+          <!-- RESULT TOP BAR -->
+          <div class="result-topbar">
+            <div class="result-id">
+              <div class="result-avatar">{{analysis.symbol==='PAXGUSDT'?'G':analysis.symbol.replace('USDT','')[0]}}</div>
+              <div>
+                <div class="result-pair">{{fmtSym(analysis.symbol)}}</div>
+                <div class="result-full">{{analysis.fullName}}</div>
+              </div>
+            </div>
+            <div class="result-ticker">
+              <div class="ticker-item">
+                <div class="ticker-lbl">Price</div>
+                <div class="ticker-val">{{fmtPrice(analysis.price)}}</div>
+              </div>
+              <div class="ticker-item">
+                <div class="ticker-lbl">24h Change</div>
+                <div :class="['ticker-val',analysis.chgPct>=0?'up':'dn']">{{fmtPrice(analysis.chgPct,true)}}</div>
+              </div>
+            </div>
+            <div class="result-actions">
+              <div :class="['signal-badge',sigClass(analysis.signal)]">
+                {{analysis.signal}} {{analysis.sigEmoji}}
+              </div>
+              <button class="btn-refresh" @click="reanalyze">
+                <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+                Re-analyze
+              </button>
+            </div>
           </div>
-        </div>
 
-        <!-- ROW 1: Chart + Entry -->
-        <div class="results-grid">
-          <!-- Chart + Volume Profile -->
-          <div style="display:flex;flex-direction:column;gap:.75rem">
-            <div class="panel">
-              <div class="panel-head">
-                <span class="panel-head-title">Trading Chart (Signal Mode)</span>
-                <div style="display:flex;gap:6px;align-items:center">
-                  <div class="chart-mode-toggle">
-                    <button :class="['btn-cmode',{active:chartMode==='signal'}]" @click="setChart('signal')">🎯 Signal</button>
-                    <button :class="['btn-cmode',{active:chartMode==='tv'}]" @click="setChart('tv')">📊 Standard</button>
+          <!-- CONFLUENCE GATE BANNER -->
+          <div :class="['conf-gate', analysis.gatePass?'pass': analysis.tfAgreements<2?'locked':'fail']">
+            <span class="conf-gate-icon">{{analysis.gatePass?'✅':analysis.tfAgreements<2?'🔒':'⚠️'}}</span>
+            <div class="conf-gate-text">
+              <strong>Multi-TF Confluence Gate</strong> —
+              <span v-if="analysis.gatePass">{{analysis.tfAgreements}}/5 timeframe sepakat → Signal VALID dan dapat dipercaya</span>
+              <span v-else-if="analysis.tfAgreements>=3">{{analysis.tfAgreements}}/5 TF sepakat — butuh minimal 4. Tunggu konfirmasi tambahan.</span>
+              <span v-else>Hanya {{analysis.tfAgreements}}/5 TF sepakat — sinyal <strong>TIDAK VALID</strong>. Jangan entry sekarang.</span>
+            </div>
+            <span class="conf-gate-count">{{analysis.tfAgreements}}/5 TF</span>
+          </div>
+
+          <!-- STRATEGY BAR -->
+          <div class="strategy-bar">
+            <span class="strategy-label">Strategy Mode</span>
+            <div class="strategy-btns">
+              <button :class="['btn-strat',{active:profile==='scalping'}]" @click="changeProfile('scalping')">⚡ Scalping</button>
+              <button :class="['btn-strat',{active:profile==='intraday'}]" @click="changeProfile('intraday')">📊 Intraday</button>
+              <button :class="['btn-strat',{active:profile==='swing'}]"    @click="changeProfile('swing')">📈 Swing</button>
+            </div>
+          </div>
+
+          <!-- RESULTS BODY -->
+          <div class="results-body">
+
+            <!-- ROW 1: Chart + Entry Panel -->
+            <div class="results-grid">
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <!-- Chart Panel -->
+                <div class="panel">
+                  <div class="panel-head">
+                    <span class="panel-head-title">Trading Chart — {{analysis.statTf||'1D'}}</span>
+                    <div class="chart-mode-toggle">
+                      <button :class="['btn-cmode',{active:chartMode==='signal'}]" @click="setChart('signal')">🎯 Signal</button>
+                      <button :class="['btn-cmode',{active:chartMode==='tv'}]" @click="setChart('tv')">📊 Standard</button>
+                    </div>
+                  </div>
+                  <div class="chart-wrap">
+                    <div class="chart-inner" id="lwChart" v-show="chartMode==='signal'"></div>
+                    <div class="chart-inner" id="tvChart" v-show="chartMode==='tv'"></div>
+                  </div>
+                </div>
+
+                <!-- Volume Profile Panel -->
+                <div class="panel">
+                  <div class="panel-head">
+                    <span class="panel-head-title">📊 Volume Profile</span>
+                    <div style="display:flex;gap:4px">
+                      <span class="vp-level-pill poc" v-if="analysis.vp">POC: {{fmtPrice(analysis.vp.poc)}}</span>
+                      <span class="vp-level-pill vah" v-if="analysis.vp">VAH: {{fmtPrice(analysis.vp.vah)}}</span>
+                      <span class="vp-level-pill val-pill" v-if="analysis.vp">VAL: {{fmtPrice(analysis.vp.val)}}</span>
+                    </div>
+                  </div>
+                  <div class="vp-body" v-if="analysis.vp && analysis.vp.levels.length>0">
+                    <div v-for="lv in analysis.vp.levels" :key="lv.price" class="vp-bar-row">
+                      <span class="vp-price-label">{{fmtPrice(lv.price)}}</span>
+                      <div class="vp-bar-track">
+                        <div :class="['vp-bar-fill', lv.isPoc?'poc':lv.inVa?'val':'normal']" :style="{width: lv.pct+'%'}"></div>
+                        <span v-if="lv.isPoc" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:.52rem;font-weight:700;color:white;font-family:var(--font-mono)">POC</span>
+                      </div>
+                      <span class="vp-vol-label">{{lv.volStr}}</span>
+                    </div>
+                    <div class="vp-legend">
+                      <div class="vp-leg-item"><div class="vp-leg-dot" style="background:var(--red)"></div>Point of Control</div>
+                      <div class="vp-leg-item"><div class="vp-leg-dot" style="background:#64b5f6"></div>Value Area</div>
+                      <div class="vp-leg-item"><div class="vp-leg-dot" style="background:var(--surface-3)"></div>Normal</div>
+                    </div>
+                  </div>
+                  <div v-else class="pa-empty">Volume Profile data tidak tersedia untuk pair ini.</div>
+                </div>
+              </div>
+
+              <!-- Entry Matrix Panel -->
+              <div :class="['panel','entry-panel',{short:!analysis.setup.isLong&&analysis.signal.includes('SELL'),neutral:analysis.signal==='NO SIGNAL'||analysis.signal==='NEUTRAL'}]">
+                <div class="entry-panel-head">
+                  <span class="entry-dir-badge">
+                    <span v-if="!analysis.gatePass">⛔ NO ENTRY</span>
+                    <span v-else-if="analysis.signal==='NEUTRAL'||analysis.signal==='NO SIGNAL'">⏳ RANGE BOUND</span>
+                    <span v-else-if="analysis.setup.isLong">▲ LONG SETUP</span>
+                    <span v-else>▼ SHORT SETUP</span>
+                  </span>
+                  <div class="conf-ring">
+                    <svg viewBox="0 0 48 48">
+                      <circle class="conf-bg-c" cx="24" cy="24" r="20"/>
+                      <circle class="conf-fill-c" cx="24" cy="24" r="20"
+                        :style="{strokeDashoffset: 126 - (126*analysis.score/100)}"/>
+                    </svg>
+                    <div class="conf-text">
+                      <span class="conf-pct">{{analysis.score}}%</span>
+                      <span class="conf-lbl">Conf.</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="entry-rows">
+                  <!-- Entry Status -->
+                  <div v-if="analysis.gatePass && entryStatus(analysis)" :class="['entry-status', entryStatus(analysis)?.cls]">
+                    <span class="es-emoji">{{entryStatus(analysis)?.emoji}}</span>
+                    <div class="es-text">
+                      <div class="es-label">{{entryStatus(analysis)?.label}}</div>
+                      <div class="es-sub">{{entryStatus(analysis)?.sub}}</div>
+                    </div>
+                    <span class="es-pct">{{entryStatus(analysis)?.pct}}</span>
+                  </div>
+                  <!-- No signal -->
+                  <div v-if="!analysis.gatePass" style="padding:.6rem .85rem;background:rgba(249,168,37,.05);border:1px solid rgba(249,168,37,.18);border-radius:var(--radius-sm);font-size:.7rem;color:var(--yellow);text-align:center">
+                    ⚠️ Gate belum terpenuhi ({{analysis.tfAgreements}}/5 TF). Level di bawah hanya referensi.
+                  </div>
+                  <div class="entry-row zone">
+                    <div class="entry-row-lbl">🎯 Entry Price
+                      <span style="font-size:.57rem;color:var(--text-muted);font-weight:400">{{analysis.setup.isLong?'(Limit Buy)':'(Limit Sell)'}}</span>
+                    </div>
+                    <div class="entry-row-val entry">{{fmtPrice(analysis.setup.entry)}}</div>
+                  </div>
+                  <div class="entry-row">
+                    <div class="entry-row-lbl">✅ TP 1 <span class="rr-tag">RR 1:1.5</span></div>
+                    <div class="entry-row-val tp">{{fmtPrice(analysis.setup.tp1)}}</div>
+                  </div>
+                  <div class="entry-row">
+                    <div class="entry-row-lbl">✅ TP 2 <span class="rr-tag">RR 1:3.0</span></div>
+                    <div class="entry-row-val tp">{{fmtPrice(analysis.setup.tp2)}}</div>
+                  </div>
+                  <div class="entry-row">
+                    <div class="entry-row-lbl">✅ TP 3 <span class="rr-tag">RR 1:5.0</span></div>
+                    <div class="entry-row-val tp">{{fmtPrice(analysis.setup.tp3)}}</div>
+                  </div>
+                  <div class="entry-row sl-row">
+                    <div class="entry-row-lbl">🛑 Stop Loss</div>
+                    <div class="entry-row-val sl">{{fmtPrice(analysis.setup.sl)}}</div>
                   </div>
                 </div>
               </div>
-              <div class="chart-wrap">
-                <div class="chart-inner" id="lwChart" v-show="chartMode==='signal'"></div>
-                <div class="chart-inner" id="tvChart" v-show="chartMode==='tv'"></div>
-              </div>
             </div>
 
-            <!-- Volume Profile Panel -->
-            <div class="vp-panel panel">
-              <div class="panel-head">
-                <span class="panel-head-title">📊 Volume Profile</span>
-                <div style="display:flex;gap:8px">
-                  <span class="vp-level-pill poc" v-if="analysis.vp">POC: {{fmtPrice(analysis.vp.poc)}}</span>
-                  <span class="vp-level-pill vah" v-if="analysis.vp">VAH: {{fmtPrice(analysis.vp.vah)}}</span>
-                  <span class="vp-level-pill val-pill" v-if="analysis.vp">VAL: {{fmtPrice(analysis.vp.val)}}</span>
+            <!-- ROW 2: Confluence Table + SMC -->
+            <div class="results-grid">
+              <!-- Confluence Table -->
+              <div class="panel">
+                <div class="panel-head">
+                  <span class="panel-head-title">Multi-TF Confluence Matrix (min 4/5)</span>
+                  <span style="font-family:var(--font-mono);font-size:.6rem;color:var(--text-muted)">{{lastAnalyzedTime}}</span>
+                </div>
+                <div style="overflow-x:auto">
+                  <table class="conf-table">
+                    <thead>
+                      <tr><th>TF</th><th>✓</th><th>Trend</th><th>RSI</th><th>MACD</th><th>Vol</th><th>Score</th><th>Signal</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="tf in TIMEFRAMES" :key="tf.id">
+                        <td class="tf-label">{{tf.label}}</td>
+                        <td>
+                          <span :class="['tf-check', getTfData(tf.id)?.skipped?'skip': getTfData(tf.id)?.agrees?'agree':'disagree']">
+                            {{getTfData(tf.id)?.skipped?'–':getTfData(tf.id)?.agrees?'✓':'✗'}}
+                          </span>
+                        </td>
+                        <td><span :class="['trend-badge', getTrendClass(tf.id)]">{{getTrendText(tf.id)}}</span></td>
+                        <td style="font-family:var(--font-mono);font-size:.7rem">{{getRsiText(tf.id)}}</td>
+                        <td style="font-size:.68rem">{{getMacdText(tf.id)}}</td>
+                        <td style="font-size:.68rem">{{getVolText(tf.id)}}</td>
+                        <td style="font-family:var(--font-mono);font-weight:700;font-size:.72rem;color:var(--blue-light)">{{getScore(tf.id)}}</td>
+                        <td><span :class="['sig-badge', getSigClass(tf.id)]">{{getSigText(tf.id)}}</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
-              <div class="vp-body" v-if="analysis.vp && analysis.vp.levels.length>0">
-                <div v-for="lv in analysis.vp.levels" :key="lv.price" class="vp-bar-row">
-                  <span class="vp-price-label">{{fmtPrice(lv.price)}}</span>
-                  <div class="vp-bar-track">
-                    <div :class="['vp-bar-fill', lv.isPoc?'poc':lv.inVa?'val':'normal']"
-                         :style="{width: lv.pct+'%'}"></div>
-                    <span v-if="lv.isPoc" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:.58rem;font-weight:700;color:white;font-family:var(--font-mono)">POC</span>
+
+              <!-- SMC Panel -->
+              <div class="panel">
+                <div class="panel-head"><span class="panel-head-title">🎯 Smart Money Concept (SMC)</span></div>
+                <div class="smc-grid" v-if="analysis.smc">
+                  <div class="smc-card">
+                    <div class="smc-card-title">Order Block</div>
+                    <div :class="['smc-card-val', analysis.smc.ob.type]">{{analysis.smc.ob.label}}</div>
+                    <span :class="['smc-tag', analysis.smc.ob.type]">{{analysis.smc.ob.detail}}</span>
                   </div>
-                  <span class="vp-vol-label">{{lv.volStr}}</span>
-                </div>
-                <div class="vp-legend">
-                  <div class="vp-leg-item"><div class="vp-leg-dot" style="background:#ef4444"></div>Point of Control (POC)</div>
-                  <div class="vp-leg-item"><div class="vp-leg-dot" style="background:#0ea5e9"></div>Value Area</div>
-                  <div class="vp-leg-item"><div class="vp-leg-dot" style="background:#94a3b8"></div>Normal Volume</div>
-                </div>
-              </div>
-              <div v-else class="pa-empty">Volume Profile data tidak tersedia untuk pair ini.</div>
-            </div>
-          </div>
-
-          <!-- Entry Matrix -->
-          <div :class="['panel','entry-panel',{short:!analysis.setup.isLong&&analysis.signal.includes('SELL'),neutral:analysis.signal==='NO SIGNAL'||analysis.signal==='NEUTRAL'}]">
-            <div class="entry-panel-head">
-              <span class="entry-dir-badge">
-                <span v-if="!analysis.gatePass">⛔ NO ENTRY</span>
-                <span v-else-if="analysis.signal==='NEUTRAL'||analysis.signal==='NO SIGNAL'">⏳ RANGE BOUND</span>
-                <span v-else-if="analysis.setup.isLong">▲ LONG SETUP</span>
-                <span v-else>▼ SHORT SETUP</span>
-              </span>
-              <div class="conf-ring">
-                <svg viewBox="0 0 60 60">
-                  <circle class="conf-bg-c" cx="30" cy="30" r="25"/>
-                  <circle class="conf-fill-c" cx="30" cy="30" r="25"
-                    :style="{strokeDashoffset: 160 - (160*analysis.score/100)}"/>
-                </svg>
-                <div class="conf-text">
-                  <span class="conf-pct">{{analysis.score}}%</span>
-                  <span class="conf-lbl">Conf.</span>
+                  <div class="smc-card">
+                    <div class="smc-card-title">Fair Value Gap</div>
+                    <div :class="['smc-card-val', analysis.smc.fvg.type]">{{analysis.smc.fvg.label}}</div>
+                    <span :class="['smc-tag', analysis.smc.fvg.type]">{{analysis.smc.fvg.detail}}</span>
+                  </div>
+                  <div class="smc-card">
+                    <div class="smc-card-title">Liquidity Sweep</div>
+                    <div :class="['smc-card-val', analysis.smc.liq.type]">{{analysis.smc.liq.label}}</div>
+                    <span :class="['smc-tag', analysis.smc.liq.type]">{{analysis.smc.liq.detail}}</span>
+                  </div>
+                  <div class="smc-card">
+                    <div class="smc-card-title">Market Structure</div>
+                    <div :class="['smc-card-val', analysis.smc.ms.type]">{{analysis.smc.ms.label}}</div>
+                    <span :class="['smc-tag', analysis.smc.ms.type]">{{analysis.smc.ms.detail}}</span>
+                  </div>
+                  <div class="smc-card">
+                    <div class="smc-card-title">Premium / Discount</div>
+                    <div :class="['smc-card-val', analysis.smc.pd.type]">{{analysis.smc.pd.label}}</div>
+                    <span :class="['smc-tag', analysis.smc.pd.type]">{{analysis.smc.pd.detail}}</span>
+                  </div>
+                  <div class="smc-card">
+                    <div class="smc-card-title">BOS / ChoCH</div>
+                    <div :class="['smc-card-val', analysis.smc.bos.type]">{{analysis.smc.bos.label}}</div>
+                    <span :class="['smc-tag', analysis.smc.bos.type]">{{analysis.smc.bos.detail}}</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="entry-rows">
 
-              <!-- Entry Status -->
-              <div v-if="analysis.gatePass && entryStatus(analysis)" :class="['entry-status', entryStatus(analysis)?.cls]">
-                <span class="es-emoji">{{entryStatus(analysis)?.emoji}}</span>
-                <div class="es-text">
-                  <div class="es-label">{{entryStatus(analysis)?.label}}</div>
-                  <div class="es-sub">{{entryStatus(analysis)?.sub}}</div>
+            <!-- ROW 3: Indicators + Price Action -->
+            <div class="results-grid">
+              <!-- Key Indicators -->
+              <div class="panel">
+                <div class="panel-head">
+                  <span class="panel-head-title">Key Indicators ({{analysis.statTf||'1D'}})</span>
                 </div>
-                <span class="es-pct">{{entryStatus(analysis)?.pct}}</span>
-              </div>
-
-              <!-- No signal state -->
-              <div v-if="!analysis.gatePass" style="padding:.75rem;background:rgba(245,158,11,.07);border:1.5px solid rgba(245,158,11,.3);border-radius:var(--radius-md);font-size:.82rem;color:#b45309;text-align:center">
-                ⚠️ Confluence Gate belum terpenuhi ({{analysis.tfAgreements}}/5 TF). Level entry di bawah hanya referensi — jangan buka posisi sekarang.
-              </div>
-
-              <div class="entry-row zone">
-                <div class="entry-row-lbl">🎯 Entry Price
-                  <span style="font-size:.62rem;color:var(--text-muted);font-weight:500;margin-left:3px">{{analysis.setup.isLong?'(Limit Buy)':'(Limit Sell)'}}</span>
-                </div>
-                <div class="entry-row-val entry">{{fmtPrice(analysis.setup.entry)}}</div>
-              </div>
-              <div class="entry-row">
-                <div class="entry-row-lbl">✅ TP 1 <span class="rr-tag">RR 1:1.5</span></div>
-                <div class="entry-row-val tp">{{fmtPrice(analysis.setup.tp1)}}</div>
-              </div>
-              <div class="entry-row">
-                <div class="entry-row-lbl">✅ TP 2 <span class="rr-tag">RR 1:3.0</span></div>
-                <div class="entry-row-val tp">{{fmtPrice(analysis.setup.tp2)}}</div>
-              </div>
-              <div class="entry-row">
-                <div class="entry-row-lbl">✅ TP 3 <span class="rr-tag">RR 1:5.0</span></div>
-                <div class="entry-row-val tp">{{fmtPrice(analysis.setup.tp3)}}</div>
-              </div>
-              <div class="entry-row sl-row">
-                <div class="entry-row-lbl">🛑 Stop Loss</div>
-                <div class="entry-row-val sl">{{fmtPrice(analysis.setup.sl)}}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ROW 2: Confluence Table + SMC + Price Action -->
-        <div class="results-grid">
-          <!-- Confluence Table -->
-          <div class="panel">
-            <div class="panel-head">
-              <span class="panel-head-title">Multi-TF Confluence Matrix (min 4/5)</span>
-              <span style="font-family:var(--font-mono);font-size:.68rem;color:var(--accent)">{{lastAnalyzedTime}}</span>
-            </div>
-            <div style="overflow-x:auto">
-              <table class="conf-table">
-                <thead>
-                  <tr>
-                    <th>TF</th><th>✓</th><th>Trend</th><th>RSI</th><th>MACD</th><th>Vol</th><th>Score</th><th>Signal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="tf in TIMEFRAMES" :key="tf.id">
-                    <td class="tf-label">{{tf.label}}</td>
-                    <td>
-                      <span :class="['tf-check', getTfData(tf.id)?.skipped?'skip': getTfData(tf.id)?.agrees?'agree':'disagree']">
-                        {{getTfData(tf.id)?.skipped?'–':getTfData(tf.id)?.agrees?'✓':'✗'}}
+                <div class="ind-grid">
+                  <div class="micro">
+                    <div class="micro-lbl">RSI (14)</div>
+                    <div class="micro-val">
+                      <span>{{analysis.rsi!==null?analysis.rsi.toFixed(2):'N/A'}}</span>
+                      <span :style="{fontSize:'.62rem',fontWeight:'700',color:analysis.rsi>70?'var(--red)':analysis.rsi<30?'var(--green)':'var(--text-muted)'}">
+                        {{analysis.rsi>70?'OB':analysis.rsi<30?'OS':'Neutral'}}
                       </span>
-                    </td>
-                    <td>
-                      <span :class="['trend-badge', getTrendClass(tf.id)]">{{getTrendText(tf.id)}}</span>
-                    </td>
-                    <td style="font-family:var(--font-mono);font-size:.78rem">{{getRsiText(tf.id)}}</td>
-                    <td style="font-size:.76rem">{{getMacdText(tf.id)}}</td>
-                    <td style="font-size:.76rem">{{getVolText(tf.id)}}</td>
-                    <td style="font-family:var(--font-mono);font-weight:700;font-size:.8rem;color:var(--accent)">{{getScore(tf.id)}}</td>
-                    <td><span :class="['sig-badge', getSigClass(tf.id)]">{{getSigText(tf.id)}}</span></td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                    <div class="rsi-track">
+                      <div class="rsi-mid"></div>
+                      <div v-if="analysis.rsi" class="rsi-dot" :style="{left:analysis.rsi+'%'}"></div>
+                    </div>
+                  </div>
+                  <div class="micro">
+                    <div class="micro-lbl">ATR (14)</div>
+                    <div class="micro-val">{{fmtPrice(analysis.atr)}}</div>
+                    <div class="micro-det">Volatility: {{((analysis.atr/analysis.price)*100).toFixed(2)}}%</div>
+                  </div>
+                  <div class="micro">
+                    <div class="micro-lbl">Bollinger Bands (20,2)</div>
+                    <div class="micro-val" style="font-size:.65rem">
+                      {{analysis.bbL?fmtPrice(analysis.bbL)+' / '+fmtPrice(analysis.bbU):'N/A'}}
+                    </div>
+                    <div class="micro-det">{{bbPos(analysis)}}</div>
+                  </div>
+                  <div class="micro">
+                    <div class="micro-lbl">S/R Levels</div>
+                    <div class="level-wrap">
+                      <div class="level-pill res"><span>Resistance</span><span>{{fmtPrice(analysis.levelRes)}}</span></div>
+                      <div class="level-pill sup"><span>Support</span><span>{{fmtPrice(analysis.levelSup)}}</span></div>
+                    </div>
+                  </div>
+                  <div class="micro">
+                    <div class="micro-lbl">Volume (24h)</div>
+                    <div class="micro-val">{{analysis.volStr||'N/A'}}</div>
+                    <div class="micro-det">vs avg: {{analysis.volVsAvg||'N/A'}}</div>
+                  </div>
+                  <div class="micro">
+                    <div class="micro-lbl">EMA Alignment</div>
+                    <div class="micro-val" style="font-size:.7rem">{{analysis.emaAlign||'N/A'}}</div>
+                    <div class="micro-det">{{analysis.emaDetail||''}}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price Action Patterns -->
+              <div class="panel">
+                <div class="panel-head">
+                  <span class="panel-head-title">🕯️ Price Action Patterns</span>
+                  <span style="font-size:.6rem;color:var(--text-muted)">Multi-TF scan</span>
+                </div>
+                <div class="pa-grid" v-if="analysis.patterns && analysis.patterns.length>0">
+                  <div v-for="p in analysis.patterns" :key="p.name+p.tf" :class="['pa-card','pa-'+p.dir]">
+                    <div class="pa-pattern">{{p.name}}</div>
+                    <div class="pa-tf">{{p.tf}} timeframe</div>
+                    <span :class="['pa-dir',p.dir]">{{p.dir==='bull'?'🟢 Bullish':p.dir==='bear'?'🔴 Bearish':'⚪ Neutral'}}</span>
+                  </div>
+                </div>
+                <div class="pa-empty" v-else>
+                  <div style="font-size:1.3rem;margin-bottom:5px">🕯️</div>
+                  Tidak ada pola candlestick signifikan pada candle terakhir.
+                </div>
+              </div>
+            </div>
+
+            <!-- SUMMARY + TELEGRAM -->
+            <div class="summary-panel">
+              <div class="panel-head"><span class="panel-head-title">Analysis Summary</span></div>
+              <div class="summary-body">
+                <p class="summary-text">{{analysis.summary}}</p>
+                <button class="btn-telegram" :disabled="fwding" @click="forwardSignal">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.7 3.96-.98 5.48-.12.64-.36.85-.59.87-.5.05-.88-.32-1.37-.64-.76-.5-1.19-.82-1.93-1.3-.85-.56-.3-.87.19-1.37.13-.13 2.33-2.14 2.37-2.31.01-.02.01-.1-.05-.15-.06-.05-.15-.03-.21-.02-.09.02-1.48.94-4.19 2.77-.4.27-.76.41-1.08.4-.35-.01-1.02-.2-1.52-.36-.61-.2-1.1-.31-1.05-.66.02-.18.27-.37.75-.56 2.93-1.28 4.88-2.12 5.85-2.52 2.78-1.14 3.36-1.33 3.74-1.34.08 0 .27.02.39.12.1.08.13.19.14.28-.01.04-.01.14-.02.21z"/></svg>
+                  {{fwding?'Sending…':'Forward Signal to @KyySISBOT'}}
+                </button>
+              </div>
+            </div>
+
+          </div><!-- end results-body -->
+        </div><!-- end state-results -->
+      </div><!-- end dashboard -->
+
+      <!-- ========== NEWS PAGE ========== -->
+      <div v-show="page==='news'" class="news-page">
+        <div class="news-panel">
+          <div class="news-panel-head">
+            <div class="news-panel-title">
+              <div class="news-dot"></div>
+              Crypto News Feed
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <div class="news-filter-tabs">
+                <button :class="['news-filter-btn',{active:newsFilter==='all'}]" @click="newsFilter='all'">All</button>
+                <button :class="['news-filter-btn',{active:newsFilter==='today'}]" @click="newsFilter='today'">Today</button>
+                <button :class="['news-filter-btn',{active:newsFilter==='bullish'}]" @click="newsFilter='bullish'">🟢 Bull</button>
+                <button :class="['news-filter-btn',{active:newsFilter==='bearish'}]" @click="newsFilter='bearish'">🔴 Bear</button>
+              </div>
+              <button :class="['news-refresh-btn',{spinning:newsLoading}]" @click="fetchNews" :disabled="newsLoading">
+                <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+                {{newsLoading?'Loading…':'Refresh'}}
+              </button>
             </div>
           </div>
-
-          <!-- SMC Panel -->
-          <div class="panel">
-            <div class="panel-head"><span class="panel-head-title">🎯 Smart Money Concept (SMC)</span></div>
-            <div class="smc-grid" v-if="analysis.smc">
-              <div class="smc-card">
-                <div class="smc-card-title">Order Block</div>
-                <div :class="['smc-card-val', analysis.smc.ob.type]">{{analysis.smc.ob.label}}</div>
-                <span :class="['smc-tag', analysis.smc.ob.type]">{{analysis.smc.ob.detail}}</span>
-              </div>
-              <div class="smc-card">
-                <div class="smc-card-title">Fair Value Gap</div>
-                <div :class="['smc-card-val', analysis.smc.fvg.type]">{{analysis.smc.fvg.label}}</div>
-                <span :class="['smc-tag', analysis.smc.fvg.type]">{{analysis.smc.fvg.detail}}</span>
-              </div>
-              <div class="smc-card">
-                <div class="smc-card-title">Liquidity Sweep</div>
-                <div :class="['smc-card-val', analysis.smc.liq.type]">{{analysis.smc.liq.label}}</div>
-                <span :class="['smc-tag', analysis.smc.liq.type]">{{analysis.smc.liq.detail}}</span>
-              </div>
-              <div class="smc-card">
-                <div class="smc-card-title">Market Structure</div>
-                <div :class="['smc-card-val', analysis.smc.ms.type]">{{analysis.smc.ms.label}}</div>
-                <span :class="['smc-tag', analysis.smc.ms.type]">{{analysis.smc.ms.detail}}</span>
-              </div>
-              <div class="smc-card">
-                <div class="smc-card-title">Premium / Discount</div>
-                <div :class="['smc-card-val', analysis.smc.pd.type]">{{analysis.smc.pd.label}}</div>
-                <span :class="['smc-tag', analysis.smc.pd.type]">{{analysis.smc.pd.detail}}</span>
-              </div>
-              <div class="smc-card">
-                <div class="smc-card-title">BOS / ChoCH</div>
-                <div :class="['smc-card-val', analysis.smc.bos.type]">{{analysis.smc.bos.label}}</div>
-                <span :class="['smc-tag', analysis.smc.bos.type]">{{analysis.smc.bos.detail}}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ROW 3: Indicators + Price Action Patterns -->
-        <div class="results-grid">
-          <!-- Key Indicators -->
-          <div class="panel">
-            <div class="panel-head">
-              <span class="panel-head-title">Key Indicators ({{analysis.statTf||'1D'}})</span>
-            </div>
-            <div class="ind-grid">
-              <div class="micro">
-                <div class="micro-lbl">RSI (14)</div>
-                <div class="micro-val">
-                  <span>{{analysis.rsi!==null?analysis.rsi.toFixed(2):'N/A'}}</span>
-                  <span :style="{fontSize:'.7rem',fontWeight:'700',color:analysis.rsi>70?'#dc2626':analysis.rsi<30?'#16a34a':'#64748b'}">
-                    {{analysis.rsi>70?'OB':analysis.rsi<30?'OS':'Neutral'}}
+          <div class="news-list" v-if="filteredNews.length>0">
+            <div v-for="item in filteredNews" :key="item.id" class="news-item" @click="selectedNews=item">
+              <div :class="['news-sent-dot',item.sentiment]"></div>
+              <div class="news-content">
+                <div class="news-title-s">{{item.title}}</div>
+                <div class="news-meta-row">
+                  <span class="news-source-s">{{item.source}}</span>
+                  <span class="news-time-s">{{item.timeAgo}}</span>
+                  <span :class="['news-badge-s',item.sentiment]">
+                    {{item.sentiment==='bullish'?'🟢 Bull':item.sentiment==='bearish'?'🔴 Bear':'⚪ Neutral'}}
                   </span>
                 </div>
-                <div class="rsi-track">
-                  <div class="rsi-mid"></div>
-                  <div v-if="analysis.rsi" class="rsi-dot" :style="{left:analysis.rsi+'%'}"></div>
+              </div>
+            </div>
+          </div>
+          <div class="news-empty" v-else>
+            <div style="font-size:1.8rem;margin-bottom:6px">📭</div>
+            {{newsLoading?'Memuat berita…':newsItems.length===0?'Klik Refresh untuk memuat berita.':'Tidak ada berita untuk filter ini.'}}
+          </div>
+        </div>
+
+        <div class="cal-panel">
+          <div class="cal-head">
+            <div class="cal-title"><div class="cal-dot"></div> Economic Calendar</div>
+          </div>
+          <div class="cal-list" v-if="groupedCal.length>0">
+            <div v-for="g in groupedCal" :key="g.label">
+              <div :class="['cal-day-label',g.type]">{{g.label}}</div>
+              <div v-for="ev in g.events" :key="ev.id" class="cal-event">
+                <div :class="['cal-imp',ev.impact]"><div class="cal-imp-dot"></div></div>
+                <div class="cal-cnt">
+                  <div class="cal-ev-name">{{ev.name}}</div>
+                  <div class="cal-ev-meta">
+                    <span class="cal-country">{{ev.country}}</span>
+                    <span class="cal-time">{{ev.time}}</span>
+                    <span class="cal-imp-label" :style="calImpStyle(ev.impact)">{{ev.impact.toUpperCase()}}</span>
+                  </div>
+                  <div class="cal-vals" v-if="ev.actual||ev.forecast||ev.previous">
+                    <span class="cal-val" v-if="ev.actual"><span class="cal-val-lbl">Act:</span><span class="cal-val-actual">{{ev.actual}}</span></span>
+                    <span class="cal-val" v-if="ev.forecast"><span class="cal-val-lbl">Est:</span><span class="cal-val-forecast">{{ev.forecast}}</span></span>
+                    <span class="cal-val" v-if="ev.previous"><span class="cal-val-lbl">Prev:</span><span class="cal-val-prev">{{ev.previous}}</span></span>
+                  </div>
                 </div>
               </div>
-              <div class="micro">
-                <div class="micro-lbl">ATR (14)</div>
-                <div class="micro-val">{{fmtPrice(analysis.atr)}}</div>
-                <div class="micro-det">Volatility: {{((analysis.atr/analysis.price)*100).toFixed(2)}}%</div>
-              </div>
-              <div class="micro">
-                <div class="micro-lbl">Bollinger Bands (20,2)</div>
-                <div class="micro-val" style="font-size:.72rem">
-                  {{analysis.bbL?fmtPrice(analysis.bbL)+' / '+fmtPrice(analysis.bbU):'N/A'}}
-                </div>
-                <div class="micro-det">{{bbPos(analysis)}}</div>
-              </div>
-              <div class="micro">
-                <div class="micro-lbl">S/R Levels</div>
-                <div class="level-wrap">
-                  <div class="level-pill res"><span>Resistance</span><span>{{fmtPrice(analysis.levelRes)}}</span></div>
-                  <div class="level-pill sup"><span>Support</span><span>{{fmtPrice(analysis.levelSup)}}</span></div>
-                </div>
-              </div>
-              <div class="micro">
-                <div class="micro-lbl">Volume (24h)</div>
-                <div class="micro-val">{{analysis.volStr||'N/A'}}</div>
-                <div class="micro-det">vs avg: {{analysis.volVsAvg||'N/A'}}</div>
-              </div>
-              <div class="micro">
-                <div class="micro-lbl">EMA Alignment</div>
-                <div class="micro-val" style="font-size:.78rem">{{analysis.emaAlign||'N/A'}}</div>
-                <div class="micro-det">{{analysis.emaDetail||''}}</div>
-              </div>
             </div>
           </div>
+          <div class="news-empty" v-else><div style="font-size:1.8rem;margin-bottom:6px">📅</div>Loading economic calendar…</div>
+        </div>
+      </div><!-- end news page -->
 
-          <!-- Price Action Patterns -->
-          <div class="panel">
-            <div class="panel-head">
-              <span class="panel-head-title">🕯️ Price Action Patterns</span>
-              <span style="font-size:.68rem;color:var(--text-muted)">Multi-TF scan</span>
-            </div>
-            <div class="pa-grid" v-if="analysis.patterns && analysis.patterns.length>0">
-              <div v-for="p in analysis.patterns" :key="p.name+p.tf"
-                   :class="['pa-card','pa-'+p.dir]">
-                <div class="pa-pattern">{{p.name}}</div>
-                <div class="pa-tf">{{p.tf}} timeframe</div>
-                <span :class="['pa-dir',p.dir]">{{p.dir==='bull'?'🟢 Bullish':p.dir==='bear'?'🔴 Bearish':'⚪ Neutral'}}</span>
-              </div>
-            </div>
-            <div class="pa-empty" v-else>
-              <div style="font-size:1.5rem;margin-bottom:6px">🕯️</div>
-              Tidak ada pola candlestick signifikan pada candle terakhir.
-            </div>
-          </div>
-        </div>
-
-        <!-- SUMMARY + TELEGRAM -->
-        <div class="summary-panel">
-          <div class="panel-head">
-            <span class="panel-head-title">Analysis Summary</span>
-          </div>
-          <div class="summary-body">
-            <p class="summary-text">{{analysis.summary}}</p>
-            <button class="btn-telegram" :disabled="fwding" @click="forwardSignal">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.7 3.96-.98 5.48-.12.64-.36.85-.59.87-.5.05-.88-.32-1.37-.64-.76-.5-1.19-.82-1.93-1.3-.85-.56-.3-.87.19-1.37.13-.13 2.33-2.14 2.37-2.31.01-.02.01-.1-.05-.15-.06-.05-.15-.03-.21-.02-.09.02-1.48.94-4.19 2.77-.4.27-.76.41-1.08.4-.35-.01-1.02-.2-1.52-.36-.61-.2-1.1-.31-1.05-.66.02-.18.27-.37.75-.56 2.93-1.28 4.88-2.12 5.85-2.52 2.78-1.14 3.36-1.33 3.74-1.34.08 0 .27.02.39.12.1.08.13.19.14.28-.01.04-.01.14-.02.21z"/></svg>
-              {{fwding?'Sending…':'Forward Signal to @KyySISBOT'}}
-            </button>
-          </div>
-        </div>
-
-      </div><!-- end state-results -->
-    </div><!-- end main-panel -->
-  </div><!-- end dashboard-grid -->
-
-  <!-- NEWS PAGE -->
-  <div class="news-page" v-show="page==='news'">
-    <div class="news-panel">
-      <div class="news-panel-head">
-        <div class="news-panel-title">
-          <div class="news-dot"></div>
-          Crypto News Feed
-        </div>
-        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
-          <div class="news-filter-tabs">
-            <button :class="['news-filter-btn',{active:newsFilter==='all'}]" @click="newsFilter='all'">All</button>
-            <button :class="['news-filter-btn',{active:newsFilter==='today'}]" @click="newsFilter='today'">Today</button>
-            <button :class="['news-filter-btn',{active:newsFilter==='bullish'}]" @click="newsFilter='bullish'">🟢 Bull</button>
-            <button :class="['news-filter-btn',{active:newsFilter==='bearish'}]" @click="newsFilter='bearish'">🔴 Bear</button>
-          </div>
-          <button :class="['news-refresh-btn',{spinning:newsLoading}]" @click="fetchNews" :disabled="newsLoading">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
-            {{newsLoading?'Loading…':'Refresh'}}
-          </button>
-        </div>
-      </div>
-      <div class="news-list" v-if="filteredNews.length>0">
-        <div v-for="item in filteredNews" :key="item.id" class="news-item" @click="selectedNews=item">
-          <div :class="['news-sent-dot',item.sentiment]"></div>
-          <div class="news-content">
-            <div class="news-title-s">{{item.title}}</div>
-            <div class="news-meta-row">
-              <span class="news-source-s">{{item.source}}</span>
-              <span class="news-time-s">{{item.timeAgo}}</span>
-              <span :class="['news-badge-s',item.sentiment]">
-                {{item.sentiment==='bullish'?'🟢 Bull':item.sentiment==='bearish'?'🔴 Bear':'⚪ Neutral'}}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="news-empty" v-else>
-        <div style="font-size:2rem;margin-bottom:7px">📭</div>
-        {{newsLoading?'Memuat berita…':newsItems.length===0?'Klik Refresh untuk memuat berita.':'Tidak ada berita untuk filter ini.'}}
-      </div>
-    </div>
-
-    <div class="cal-panel">
-      <div class="cal-head">
-        <div class="cal-title"><div class="cal-dot"></div> Economic Calendar</div>
-      </div>
-      <div class="cal-list" v-if="groupedCal.length>0">
-        <div v-for="g in groupedCal" :key="g.label">
-          <div :class="['cal-day-label',g.type]">{{g.label}}</div>
-          <div v-for="ev in g.events" :key="ev.id" class="cal-event">
-            <div :class="['cal-imp',ev.impact]"><div class="cal-imp-dot"></div></div>
-            <div class="cal-cnt">
-              <div class="cal-ev-name">{{ev.name}}</div>
-              <div class="cal-ev-meta">
-                <span class="cal-country">{{ev.country}}</span>
-                <span class="cal-time">{{ev.time}}</span>
-                <span class="cal-imp-label" :style="calImpStyle(ev.impact)">{{ev.impact.toUpperCase()}}</span>
-              </div>
-              <div class="cal-vals" v-if="ev.actual||ev.forecast||ev.previous">
-                <span class="cal-val" v-if="ev.actual"><span class="cal-val-lbl">Act:</span><span class="cal-val-actual">{{ev.actual}}</span></span>
-                <span class="cal-val" v-if="ev.forecast"><span class="cal-val-lbl">Est:</span><span class="cal-val-forecast">{{ev.forecast}}</span></span>
-                <span class="cal-val" v-if="ev.previous"><span class="cal-val-lbl">Prev:</span><span class="cal-val-prev">{{ev.previous}}</span></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="news-empty" v-else><div style="font-size:2rem;margin-bottom:7px">📅</div>Loading economic calendar…</div>
-    </div>
-  </div>
+    </div><!-- end main-content -->
+  </div><!-- end body-layout -->
 
   <!-- SETTINGS MODAL -->
   <div v-if="settingsVisible" class="modal-backdrop" @click.self="settingsVisible=false">
@@ -1023,7 +1073,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans)
       <div class="modal-head">
         <div class="modal-title">⚙️ System Settings</div>
         <button class="modal-close" @click="settingsVisible=false">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <div class="modal-body">
@@ -1053,7 +1103,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans)
       <div class="modal-head">
         <div class="modal-title">📰 {{selectedNews.source}}</div>
         <button class="modal-close" @click="selectedNews=null">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <div class="modal-body">
@@ -1068,7 +1118,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans)
       <div class="modal-footer">
         <a :href="selectedNews.url" target="_blank" rel="noopener" class="btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:5px">
           Read Original
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
         </a>
         <button class="btn-ghost" @click="selectedNews=null">Close</button>
       </div>
@@ -1081,6 +1131,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:var(--font-sans)
       <span>{{t.emoji}}</span><span>{{t.msg}}</span>
     </div>
   </div>
+
 </div>
 
 <script>
@@ -1924,30 +1975,30 @@ createApp({
       }
       try {
         lwChart=LightweightCharts.createChart(container,{
-          width:container.clientWidth||600,height:container.clientHeight||360,
-          layout:{background:{type:'solid',color:'#0f172a'},textColor:'#64748b',fontFamily:'Plus Jakarta Sans, sans-serif',attributionLogo:false},
+          width:container.clientWidth||600,height:container.clientHeight||320,
+          layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:'Inter, sans-serif',attributionLogo:false},
           grid:{vertLines:{color:'rgba(255,255,255,.03)'},horzLines:{color:'rgba(255,255,255,.03)'}},
-          crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(56,189,248,.5)',width:1,style:3,labelBackgroundColor:'#1e293b'},horzLine:{color:'rgba(56,189,248,.5)',width:1,style:3,labelBackgroundColor:'#1e293b'}},
-          rightPriceScale:{borderColor:'rgba(255,255,255,.05)'},
-          timeScale:{borderColor:'rgba(255,255,255,.05)',timeVisible:true,secondsVisible:false}
+          crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(120,123,134,.5)',width:1,style:3,labelBackgroundColor:'#2a2e39'},horzLine:{color:'rgba(120,123,134,.5)',width:1,style:3,labelBackgroundColor:'#2a2e39'}},
+          rightPriceScale:{borderColor:'rgba(255,255,255,.04)'},
+          timeScale:{borderColor:'rgba(255,255,255,.04)',timeVisible:true,secondsVisible:false}
         });
-        const cs=lwChart.addSeries(LightweightCharts.CandlestickSeries,{upColor:'#22c55e',downColor:'#ef4444',borderUpColor:'#22c55e',borderDownColor:'#ef4444',wickUpColor:'#22c55e',wickDownColor:'#ef4444'});
+        const cs=lwChart.addSeries(LightweightCharts.CandlestickSeries,{upColor:'#26a69a',downColor:'#ef5350',borderUpColor:'#26a69a',borderDownColor:'#ef5350',wickUpColor:'#26a69a',wickDownColor:'#ef5350'});
         cs.setData(result.mainTfCandles);
         const s=result.setup;
-        cs.createPriceLine({price:s.entry,color:'#38bdf8',lineWidth:1.5,lineStyle:2,axisLabelVisible:true,title:'Entry'});
-        cs.createPriceLine({price:s.tp1,color:'#22c55e',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'TP1'});
-        cs.createPriceLine({price:s.tp2,color:'#22c55e',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'TP2'});
-        cs.createPriceLine({price:s.tp3,color:'#22c55e',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'TP3'});
-        cs.createPriceLine({price:s.sl,color:'#ef4444',lineWidth:1.5,lineStyle:2,axisLabelVisible:true,title:'SL'});
+        cs.createPriceLine({price:s.entry,color:'#64b5f6',lineWidth:1.5,lineStyle:2,axisLabelVisible:true,title:'Entry'});
+        cs.createPriceLine({price:s.tp1,color:'#26a69a',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'TP1'});
+        cs.createPriceLine({price:s.tp2,color:'#26a69a',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'TP2'});
+        cs.createPriceLine({price:s.tp3,color:'#26a69a',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'TP3'});
+        cs.createPriceLine({price:s.sl,color:'#ef5350',lineWidth:1.5,lineStyle:2,axisLabelVisible:true,title:'SL'});
         // VP levels on chart
         if (result.vp) {
-          cs.createPriceLine({price:result.vp.poc,color:'#f59e0b',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'POC'});
-          cs.createPriceLine({price:result.vp.vah,color:'#0ea5e9',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'VAH'});
-          cs.createPriceLine({price:result.vp.val,color:'#0ea5e9',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'VAL'});
+          cs.createPriceLine({price:result.vp.poc,color:'#f9a825',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'POC'});
+          cs.createPriceLine({price:result.vp.vah,color:'#1e88e5',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'VAH'});
+          cs.createPriceLine({price:result.vp.val,color:'#1e88e5',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'VAL'});
         }
         lwChart.timeScale().fitContent();
       } catch(e) {
-        container.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ef4444;font-size:.8rem;background:#0f172a">Chart error: ${e.message}</div>`;
+        container.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ef5350;font-size:.8rem;background:#131722">Chart error: ${e.message}</div>`;
       }
     }
 
@@ -1956,11 +2007,11 @@ createApp({
     function renderTvChart(symbol) {
       const container=document.getElementById('tvChart');
       if (!container) return;
-      container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:.82rem;background:#0f172a">Loading TradingView…</div>';
+      container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#787b86;font-size:.82rem;background:#131722">Loading TradingView…</div>';
       const load=()=>{
         container.innerHTML='<div id="tvInner" style="width:100%;height:100%"></div>';
         try {
-          new TradingView.widget({width:'100%',height:'100%',symbol:'BINANCE:'+symbol+'.P',interval:'60',timezone:'Etc/UTC',theme:'dark',style:'1',locale:'en',toolbar_bg:'#0f172a',enable_publishing:false,hide_side_toolbar:false,allow_symbol_change:true,container_id:'tvInner'});
+          new TradingView.widget({width:'100%',height:'100%',symbol:'BINANCE:'+symbol+'.P',interval:'60',timezone:'Etc/UTC',theme:'dark',style:'1',locale:'en',toolbar_bg:'#131722',enable_publishing:false,hide_side_toolbar:false,allow_symbol_change:true,container_id:'tvInner'});
         } catch {}
       };
       if (typeof TradingView!=='undefined'){load();}
@@ -1968,7 +2019,7 @@ createApp({
         const s=document.createElement('script');
         s.src='https://s3.tradingview.com/tv.js';s.async=true;
         s.onload=load;
-        s.onerror=()=>{container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:.82rem;background:#0f172a;text-align:center;padding:1rem">⚠️ TradingView blocked. Use VPN or Signal mode.</div>';};
+        s.onerror=()=>{container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#787b86;font-size:.82rem;background:#131722;text-align:center;padding:1rem">⚠️ TradingView blocked. Use VPN or Signal mode.</div>';};
         document.head.appendChild(s);
       }
     }
@@ -2123,7 +2174,7 @@ createApp({
     });
 
     const fmtDate=d=>new Date(d+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    const calImpStyle=imp=>imp==='high'?'background:rgba(239,68,68,.1);color:#dc2626':imp==='medium'?'background:rgba(245,158,11,.1);color:#d97706':'background:var(--gray-100);color:var(--gray-500)';
+    const calImpStyle=imp=>imp==='high'?'background:rgba(239,83,80,.1);color:#ef5350':imp==='medium'?'background:rgba(249,168,37,.1);color:#f9a825':'background:var(--surface-2);color:var(--text-muted)';
 
     onMounted(()=>{fetchPrices();startTimer();});
 

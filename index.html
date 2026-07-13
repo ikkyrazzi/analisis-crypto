@@ -960,7 +960,7 @@ a{color:inherit;text-decoration:none}
               <!-- Price Action Patterns -->
               <div class="panel">
                 <div class="panel-head">
-                  <span class="panel-head-title">🕯️ Price Action Patterns</span>
+                  <span class="panel-head-title">🕯️ Candlestick Pattern</span>
                   <span style="font-size:.6rem;color:var(--text-muted)">Multi-TF scan</span>
                 </div>
                 <div class="pa-grid" v-if="analysis.patterns && analysis.patterns.length>0">
@@ -973,6 +973,28 @@ a{color:inherit;text-decoration:none}
                 <div class="pa-empty" v-else>
                   <div style="font-size:1.3rem;margin-bottom:5px">🕯️</div>
                   Tidak ada pola candlestick signifikan pada candle terakhir.
+                </div>
+              </div>
+            </div>
+
+            <!-- ROW 4: Chart Pattern -->
+            <div class="results-grid" style="grid-template-columns:1fr">
+              <div class="panel">
+                <div class="panel-head">
+                  <span class="panel-head-title">📐 Chart Pattern</span>
+                  <span style="font-size:.6rem;color:var(--text-muted)">S&R structure · Multi-TF scan</span>
+                </div>
+                <div class="pa-grid" v-if="analysis.chartPatterns && analysis.chartPatterns.length>0">
+                  <div v-for="p in analysis.chartPatterns" :key="p.name+p.tf" :class="['pa-card','pa-'+p.dir]">
+                    <div class="pa-pattern">{{p.name}}</div>
+                    <div class="pa-tf">{{p.tf}} timeframe</div>
+                    <span :class="['pa-dir',p.dir]">{{p.dir==='bull'?'🟢 Bullish':p.dir==='bear'?'🔴 Bearish':'⚪ Neutral'}}</span>
+                    <div style="font-size:.62rem;color:var(--text-secondary);margin-top:3px">{{p.detail}}</div>
+                  </div>
+                </div>
+                <div class="pa-empty" v-else>
+                  <div style="font-size:1.3rem;margin-bottom:5px">📐</div>
+                  Belum ada pola chart (Double Top/Bottom, H&S, Triangle, Wedge) yang jelas terbentuk saat ini.
                 </div>
               </div>
             </div>
@@ -1396,11 +1418,129 @@ function detectPatterns(candles, tfLabel) {
 }
 
 // ============================================================
+// FAIR VALUE GAP (real 3-candle ICT gap, not EMA approximation)
+// ============================================================
+function detectFVG(candles, lookback=60) {
+  if (!candles || candles.length<5) return [];
+  const start=Math.max(2, candles.length-lookback);
+  const gaps=[];
+  for (let i=start; i<candles.length; i++) {
+    const c1=candles[i-2], c3=candles[i];
+    // Bullish FVG: candle3's low is above candle1's high (gap up, imbalance)
+    if (c3.low>c1.high) gaps.push({top:c3.low, bottom:c1.high, type:'bull', idx:i});
+    // Bearish FVG: candle3's high is below candle1's low (gap down, imbalance)
+    else if (c3.high<c1.low) gaps.push({top:c1.low, bottom:c3.high, type:'bear', idx:i});
+  }
+  // Keep only gaps not yet fully mitigated (price hasn't traded all the way back through)
+  return gaps.filter(g=>{
+    for (let j=g.idx+1; j<candles.length; j++) {
+      const cc=candles[j];
+      if (g.type==='bull' && cc.low<=g.bottom) return false;
+      if (g.type==='bear' && cc.high>=g.top) return false;
+    }
+    return true;
+  });
+}
+
+// ============================================================
+// CHART PATTERN DETECTION (swing-based: Double Top/Bottom, H&S, Triangles, Wedges)
+// ============================================================
+function findSwingPoints(highs, lows, k=2, lookback=100) {
+  const start=Math.max(k, highs.length-lookback);
+  const swingHighs=[], swingLows=[];
+  for (let i=start; i<highs.length-k; i++) {
+    let isH=true, isL=true;
+    for (let j=1;j<=k;j++) {
+      if (highs[i]<highs[i-j]||highs[i]<highs[i+j]) isH=false;
+      if (lows[i]>lows[i-j]||lows[i]>lows[i+j]) isL=false;
+    }
+    if (isH) swingHighs.push({idx:i, price:highs[i]});
+    if (isL) swingLows.push({idx:i, price:lows[i]});
+  }
+  return {swingHighs, swingLows};
+}
+
+function detectChartPatterns(candles, tfLabel) {
+  const patterns=[];
+  if (!candles || candles.length<30) return patterns;
+  const highs=candles.map(c=>c.high), lows=candles.map(c=>c.low), closes=candles.map(c=>c.close);
+  const {swingHighs, swingLows}=findSwingPoints(highs, lows, 2, 100);
+  const price=closes[closes.length-1];
+  const near=(a,b,tol=.015)=>Math.abs(a-b)/((a+b)/2)<tol;
+
+  // Double Top (bearish)
+  if (swingHighs.length>=2) {
+    const h1=swingHighs[swingHighs.length-2], h2=swingHighs[swingHighs.length-1];
+    if (near(h1.price,h2.price,.015)) {
+      const between=swingLows.filter(l=>l.idx>h1.idx&&l.idx<h2.idx);
+      if (between.length>0) {
+        const neckline=Math.min(...between.map(l=>l.price));
+        patterns.push({name:'Double Top',tf:tfLabel,dir:'bear',
+          detail:price<neckline*1.01?`Neckline pecah ~$${neckline.toFixed(4)}`:`Neckline ~$${neckline.toFixed(4)}`});
+      }
+    }
+  }
+  // Double Bottom (bullish)
+  if (swingLows.length>=2) {
+    const l1=swingLows[swingLows.length-2], l2=swingLows[swingLows.length-1];
+    if (near(l1.price,l2.price,.015)) {
+      const between=swingHighs.filter(h=>h.idx>l1.idx&&h.idx<l2.idx);
+      if (between.length>0) {
+        const neckline=Math.max(...between.map(h=>h.price));
+        patterns.push({name:'Double Bottom',tf:tfLabel,dir:'bull',
+          detail:price>neckline*0.99?`Neckline pecah ~$${neckline.toFixed(4)}`:`Neckline ~$${neckline.toFixed(4)}`});
+      }
+    }
+  }
+  // Head & Shoulders (bearish)
+  if (swingHighs.length>=3) {
+    const [s1,h,s2]=swingHighs.slice(-3);
+    if (h.price>s1.price && h.price>s2.price && near(s1.price,s2.price,.03)) {
+      const troughs=swingLows.filter(l=>l.idx>s1.idx&&l.idx<s2.idx);
+      if (troughs.length>=2) {
+        const neckline=(troughs[0].price+troughs[troughs.length-1].price)/2;
+        patterns.push({name:'Head & Shoulders',tf:tfLabel,dir:'bear',
+          detail:price<neckline*1.01?`Neckline pecah ~$${neckline.toFixed(4)}`:`Neckline ~$${neckline.toFixed(4)}`});
+      }
+    }
+  }
+  // Inverse Head & Shoulders (bullish)
+  if (swingLows.length>=3) {
+    const [s1,h,s2]=swingLows.slice(-3);
+    if (h.price<s1.price && h.price<s2.price && near(s1.price,s2.price,.03)) {
+      const peaks=swingHighs.filter(p=>p.idx>s1.idx&&p.idx<s2.idx);
+      if (peaks.length>=2) {
+        const neckline=(peaks[0].price+peaks[peaks.length-1].price)/2;
+        patterns.push({name:'Inverse Head & Shoulders',tf:tfLabel,dir:'bull',
+          detail:price>neckline*0.99?`Neckline pecah ~$${neckline.toFixed(4)}`:`Neckline ~$${neckline.toFixed(4)}`});
+      }
+    }
+  }
+  // Triangles & Wedges (based on last 3 swing highs/lows slope)
+  if (swingHighs.length>=3 && swingLows.length>=3) {
+    const hs=swingHighs.slice(-3), ls=swingLows.slice(-3);
+    const highSlope=(hs[2].price-hs[0].price)/hs[0].price;
+    const lowSlope=(ls[2].price-ls[0].price)/ls[0].price;
+    const flatHigh=Math.abs(highSlope)<.01, flatLow=Math.abs(lowSlope)<.01;
+    if (flatHigh && lowSlope>.015) {
+      patterns.push({name:'Ascending Triangle',tf:tfLabel,dir:'bull',detail:'Resistance datar, support naik'});
+    } else if (flatLow && highSlope<-.015) {
+      patterns.push({name:'Descending Triangle',tf:tfLabel,dir:'bear',detail:'Support datar, resistance turun'});
+    } else if (highSlope>.01 && lowSlope>.01 && lowSlope>highSlope) {
+      patterns.push({name:'Rising Wedge',tf:tfLabel,dir:'bear',detail:'Menyempit ke atas — risiko reversal'});
+    } else if (highSlope<-.01 && lowSlope<-.01 && highSlope<lowSlope) {
+      patterns.push({name:'Falling Wedge',tf:tfLabel,dir:'bull',detail:'Menyempit ke bawah — potensi reversal naik'});
+    }
+  }
+  return patterns;
+}
+
+// ============================================================
 // SMC ANALYSIS
 // ============================================================
 function analyzeSMC(tfData, price) {
   if (!tfData) return null;
-  const {close,high,low,ema20,ema50,rsi,supports,resistances,atr} = tfData;
+  const {close,high,low,ema20,ema50,rsi,supports,resistances,atr,candles} = tfData;
   const a=atr||price*.015;
   const sup=supports.length>0?Math.max(...supports.filter(s=>s<price)):price-a;
   const res=resistances.length>0?Math.min(...resistances.filter(r=>r>price)):price+a;
@@ -1414,16 +1554,24 @@ function analyzeSMC(tfData, price) {
   if (nearSup) ob={label:'Bullish Order Block',type:'bull',detail:`Near support $${sup.toFixed(4)}`};
   else if (nearRes) ob={label:'Bearish Order Block',type:'bear',detail:`Near resistance $${res.toFixed(4)}`};
 
-  // Fair Value Gap
-  let fvg={label:'No FVG',type:'neut',detail:'EMA gap not significant'};
-  if (ema20!==null&&ema50!==null) {
-    const gap=Math.abs(ema20-ema50)/price;
-    if (gap>.008) {
-      const bullFvg=ema20>ema50&&price<ema20&&price>ema50;
-      const bearFvg=ema20<ema50&&price>ema20&&price<ema50;
-      if (bullFvg) fvg={label:'Bullish FVG',type:'bull',detail:`In ${(gap*100).toFixed(2)}% gap zone`};
-      else if (bearFvg) fvg={label:'Bearish FVG',type:'bear',detail:`In ${(gap*100).toFixed(2)}% gap zone`};
-      else fvg={label:'FVG Present',type:'neut',detail:`Gap: ${(gap*100).toFixed(2)}%`};
+  // Fair Value Gap (real 3-candle imbalance, filtered to unmitigated zones)
+  let fvg={label:'No FVG',type:'neut',detail:'Tidak ada gap 3-candle terbuka'};
+  if (candles && candles.length>5) {
+    const openGaps=detectFVG(candles, 60);
+    if (openGaps.length>0) {
+      // Prefer the gap closest to current price
+      const scored=openGaps.map(g=>({...g, mid:(g.top+g.bottom)/2, dist:Math.abs(price-(g.top+g.bottom)/2)}));
+      scored.sort((x,y)=>x.dist-y.dist);
+      const nearest=scored[0];
+      const inside=price<=nearest.top && price>=nearest.bottom;
+      const gapPct=((nearest.top-nearest.bottom)/price*100).toFixed(2);
+      if (nearest.type==='bull') {
+        fvg={label:inside?'Bullish FVG (di dalam zona)':'Bullish FVG (belum terisi)',type:'bull',
+          detail:`Zona $${nearest.bottom.toFixed(4)}–$${nearest.top.toFixed(4)} (${gapPct}%)`};
+      } else {
+        fvg={label:inside?'Bearish FVG (di dalam zona)':'Bearish FVG (belum terisi)',type:'bear',
+          detail:`Zona $${nearest.bottom.toFixed(4)}–$${nearest.top.toFixed(4)} (${gapPct}%)`};
+      }
     }
   }
 
@@ -1551,7 +1699,15 @@ function scoreTF(data, smc) {
     else if (smc.bos.type==='bear'){bear+=6;}
   }
 
-  const MAX=118; // 25+22+28+15+10+5+6+6+8+8+8+6+4+6 upper bound
+  // 8. Candlestick Pattern bonus (majority direction on this TF's last candle)
+  if (data.patternDir==='bull'){bull+=6;}
+  else if (data.patternDir==='bear'){bear+=6;}
+
+  // 9. Chart Pattern bonus (S/R structure pattern on this TF)
+  if (data.chartPatternDir==='bull'){bull+=8;}
+  else if (data.chartPatternDir==='bear'){bear+=8;}
+
+  const MAX=157; // 25+22+28+15+10+5+8+6+8+6+4+6+6+8 upper bound
   const net=50+((bull-bear)*50/MAX);
   const rsiTxt=rsi!==null?`${Math.round(rsi)}`:'N/A';
   const macdTxt=macdHist!==null?(macdHist>0&&prevH<=0?'X-Bull ✅':macdHist<0&&prevH>=0?'X-Bear ❌':macdHist>0?'Bull ✅':'Bear ❌'):'N/A';
@@ -1561,8 +1717,16 @@ function scoreTF(data, smc) {
 // ============================================================
 // FULL ANALYSIS ENGINE
 // ============================================================
+function majorityDir(arr) {
+  if (!arr || !arr.length) return null;
+  const b=arr.filter(p=>p.dir==='bull').length, r=arr.filter(p=>p.dir==='bear').length;
+  if (b>r) return 'bull';
+  if (r>b) return 'bear';
+  return null;
+}
+
 function runEngine(symbol, candleBatches, profile) {
-  const tfData={}, allPatterns=[];
+  const tfData={}, allPatterns=[], allChartPatterns=[];
 
   TIMEFRAMES.forEach(tf=>{
     const raw=candleBatches[tf.id];
@@ -1596,9 +1760,13 @@ function runEngine(symbol, candleBatches, profile) {
       open:opens[i],high:highs[i],low:lows[i],close:closes[i],vol:vols[i]
     }));
 
-    // Detect patterns for this TF
+    // Detect candlestick patterns for this TF
     const patterns=detectPatterns(candles, tf.label);
     allPatterns.push(...patterns);
+
+    // Detect chart patterns for this TF (Double Top/Bottom, H&S, Triangle, Wedge)
+    const chartPatterns=detectChartPatterns(candles, tf.label);
+    allChartPatterns.push(...chartPatterns);
 
     tfData[tf.id]={
       close:closes[n],high:highs[n],low:lows[n],open:opens[n],
@@ -1609,7 +1777,9 @@ function runEngine(symbol, candleBatches, profile) {
       atr:atr[n],
       supports:sr.supports,resistances:sr.resistances,
       vol:vols[n],avgVol,
-      candles
+      candles,
+      patternDir:majorityDir(patterns),
+      chartPatternDir:majorityDir(chartPatterns)
     };
   });
 
@@ -1726,12 +1896,20 @@ function runEngine(symbol, candleBatches, profile) {
   const volStr=fmtVol(vol24);
   const volVsAvg=mainAvgVol>0?`${(vol24/mainAvgVol).toFixed(2)}x avg`:'N/A';
 
-  // Unique patterns (dedupe by name+dir, max 6)
+  // Unique candlestick patterns (dedupe by name+dir, max 6)
   const seen=new Set(), uniquePatterns=[];
   for (const p of allPatterns) {
     const key=p.name+p.dir;
     if (!seen.has(key)){seen.add(key);uniquePatterns.push(p);}
     if (uniquePatterns.length>=6) break;
+  }
+
+  // Unique chart patterns (dedupe by name+dir, max 4)
+  const seenCp=new Set(), uniqueChartPatterns=[];
+  for (const p of allChartPatterns) {
+    const key=p.name+p.dir;
+    if (!seenCp.has(key)){seenCp.add(key);uniqueChartPatterns.push(p);}
+    if (uniqueChartPatterns.length>=4) break;
   }
 
   // Summary text
@@ -1740,21 +1918,22 @@ function runEngine(symbol, candleBatches, profile) {
   const gateNote=gatePass?`✅ Confluence Gate PASSED (${tfAgreements}/5 TF sepakat).`:`⚠️ Confluence Gate FAILED (hanya ${tfAgreements}/5 TF sepakat — butuh min 4).`;
   const vpNote=vp?`Volume POC di $${f(vp.poc)} (area high volume = magnet harga).`:'';
   const paNote=uniquePatterns.length>0?`Pola candlestick: ${uniquePatterns.map(p=>p.name).join(', ')}.`:'';
-  const smcNote=smcResult?`SMC: ${smcResult.ob.label}, ${smcResult.ms.label}, ${smcResult.pd.label}.`:'';
+  const cpNote=uniqueChartPatterns.length>0?`Chart pattern: ${uniqueChartPatterns.map(p=>p.name).join(', ')}.`:'';
+  const smcNote=smcResult?`SMC: ${smcResult.ob.label}, ${smcResult.fvg.label}, ${smcResult.ms.label}, ${smcResult.pd.label}.`:'';
 
   if (signal==='NO SIGNAL') {
-    summary=`${gateNote} ${tfAgreements} dari 5 timeframe belum cukup untuk konfirmasi. Skor agregat: ${Math.round(aggNet)}/100. Jangan buka posisi — tunggu minimal 4 TF sepakat. ${vpNote} ${smcNote} ${paNote}`.trim();
+    summary=`${gateNote} ${tfAgreements} dari 5 timeframe belum cukup untuk konfirmasi. Skor agregat: ${Math.round(aggNet)}/100. Jangan buka posisi — tunggu minimal 4 TF sepakat. ${vpNote} ${smcNote} ${cpNote} ${paNote}`.trim();
   } else if (isLong) {
-    summary=`${gateNote} ${signal} pada ${SYMBOLS.find(s=>s.symbol===symbol)?.name||symbol}. Skor: ${score}%. Entry ideal di $${f(setup.entry)} (dekat support/VAL). TP3: $${f(setup.tp3)}, SL: $${f(setup.sl)}. ${vpNote} ${smcNote} ${paNote}`.trim();
+    summary=`${gateNote} ${signal} pada ${SYMBOLS.find(s=>s.symbol===symbol)?.name||symbol}. Skor: ${score}%. Entry ideal di $${f(setup.entry)} (dekat support/VAL). TP3: $${f(setup.tp3)}, SL: $${f(setup.sl)}. ${vpNote} ${smcNote} ${cpNote} ${paNote}`.trim();
   } else {
-    summary=`${gateNote} ${signal} pada ${SYMBOLS.find(s=>s.symbol===symbol)?.name||symbol}. Skor: ${score}%. Entry ideal di $${f(setup.entry)} (dekat resistance/VAH). TP3: $${f(setup.tp3)}, SL: $${f(setup.sl)}. ${vpNote} ${smcNote} ${paNote}`.trim();
+    summary=`${gateNote} ${signal} pada ${SYMBOLS.find(s=>s.symbol===symbol)?.name||symbol}. Skor: ${score}%. Entry ideal di $${f(setup.entry)} (dekat resistance/VAH). TP3: $${f(setup.tp3)}, SL: $${f(setup.sl)}. ${vpNote} ${smcNote} ${cpNote} ${paNote}`.trim();
   }
 
   return {
     symbol, fullName:SYMBOLS.find(s=>s.symbol===symbol)?.name||symbol,
     price, chgPct:prices[symbol]?.chg||0,
     signal, sigEmoji, score, gatePass, tfAgreements,
-    setup, tfScores, vp, smc:smcResult, patterns:uniquePatterns,
+    setup, tfScores, vp, smc:smcResult, patterns:uniquePatterns, chartPatterns:uniqueChartPatterns,
     rsi:mainTf?.rsi||null, atr:atrV,
     bbU:mainTf?.bbUpper||null, bbL:mainTf?.bbLower||null,
     levelSup:nearSup, levelRes:nearRes,
@@ -2084,7 +2263,7 @@ createApp({
       const s=res.setup;
       const f=v=>fmtPrice(v);
       const gateLabel=res.gatePass?'✅ GATE PASSED':'⚠️ GATE FAILED';
-      const text=`🚨 <b>KYYSIS v3.0 SIGNAL</b>\n\n📊 Pair: <b>${fmtSym(res.symbol)}</b>\n💰 Price: <b>${f(res.price)}</b>\n📈 Signal: <b>${res.sigEmoji} ${res.signal}</b>\n🎯 Confidence: <b>${res.score}%</b>\n\n⚖️ ${gateLabel} — ${res.tfAgreements}/5 TF sepakat\n\n📍 Entry: <code>${f(s.entry)}</code>\n✅ TP1: ${f(s.tp1)}\n✅ TP2: ${f(s.tp2)}\n✅ TP3: ${f(s.tp3)}\n🛑 SL: ${f(s.sl)}\n\n${res.vp?`📊 Volume POC: ${f(res.vp.poc)}\n`:''}${res.patterns?.length>0?`🕯️ Patterns: ${res.patterns.map(p=>p.name).join(', ')}\n`:''}\n📝 <i>${res.summary}</i>\n\n⚠️ Not financial advice. DYOR.\n🤖 KyySIS v3.0`;
+      const text=`🚨 <b>KYYSIS v3.0 SIGNAL</b>\n\n📊 Pair: <b>${fmtSym(res.symbol)}</b>\n💰 Price: <b>${f(res.price)}</b>\n📈 Signal: <b>${res.sigEmoji} ${res.signal}</b>\n🎯 Confidence: <b>${res.score}%</b>\n\n⚖️ ${gateLabel} — ${res.tfAgreements}/5 TF sepakat\n\n📍 Entry: <code>${f(s.entry)}</code>\n✅ TP1: ${f(s.tp1)}\n✅ TP2: ${f(s.tp2)}\n✅ TP3: ${f(s.tp3)}\n🛑 SL: ${f(s.sl)}\n\n${res.vp?`📊 Volume POC: ${f(res.vp.poc)}\n`:''}${res.chartPatterns?.length>0?`📐 Chart Pattern: ${res.chartPatterns.map(p=>p.name).join(', ')}\n`:''}${res.patterns?.length>0?`🕯️ Candlestick: ${res.patterns.map(p=>p.name).join(', ')}\n`:''}\n📝 <i>${res.summary}</i>\n\n⚠️ Not financial advice. DYOR.\n🤖 KyySIS v3.0`;
       try {
         const r=await fetch(TG_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId,text,parse_mode:'HTML'})});
         const d=await r.json();
